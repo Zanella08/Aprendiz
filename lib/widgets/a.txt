@@ -1,0 +1,7 @@
+cor == AppColors.v1
+                                        ? TelaAudicao()
+                                        : cor == AppColors.b1
+                                            ? TelaFala()
+                                            : cor == AppColors.y1
+                                                ? TelaAssimilacao()
+                                                : TelaMemoria(),
