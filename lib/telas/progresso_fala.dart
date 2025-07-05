@@ -1,4 +1,4 @@
-import 'package:aprendiz/Atividades/fala.dart';
+import 'package:aprendiz/Atividades/fala/fala.dart';
 import 'package:aprendiz/utils/Style.dart';
 import 'package:aprendiz/utils/levels.dart';
 import 'package:aprendiz/widgets/Bottomapp.dart';
