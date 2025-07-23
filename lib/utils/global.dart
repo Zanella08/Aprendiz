@@ -8,4 +8,9 @@ class Global {
   static int colorback2 = 0;
   static bool nightMode = false;
   static bool islogged = false;
+  static int tempo = 0;
+  static DateTime? inicioUso;
+  static bool bloqueado = false;
+  static String codigoDesbloqueio = "1234";
 }
+ 

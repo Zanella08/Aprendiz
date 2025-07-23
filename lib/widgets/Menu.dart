@@ -2,15 +2,84 @@ import 'package:aprendiz/utils/Style.dart';
 import 'package:aprendiz/utils/global.dart';
 import 'package:aprendiz/widgets/modulo.dart' as custom;
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 class Menu extends StatefulWidget {
+
+
+
+  void _iniciarControleTempo(BuildContext context) {
+    if (Global.inicioUso == null) {
+      Global.inicioUso = DateTime.now();
+    }
+    Timer.periodic(Duration(seconds: 10), (timer) {
+      if (Global.bloqueado) {
+        timer.cancel();
+        return;
+      }
+      final tempoUsado = DateTime.now().difference(Global.inicioUso!).inMinutes;
+      if (tempoUsado >= Global.tempo) {
+        Global.bloqueado = true;
+        timer.cancel();
+        _mostrarPopupCodigo(context);
+      }
+    });
+  }
+
+  void _mostrarPopupCodigo(BuildContext context) {
+    TextEditingController codigoController = TextEditingController();
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Tempo excedido'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Insira o código para continuar usando o aplicativo:'),
+            SizedBox(height: 10),
+            TextField(
+              controller: codigoController,
+              decoration: InputDecoration(
+                labelText: 'Código',
+                border: OutlineInputBorder(),
+              ),
+              obscureText: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              if (codigoController.text == Global.codigoDesbloqueio) {
+                Global.bloqueado = false;
+                Global.inicioUso = DateTime.now();
+                Navigator.pop(context);
+                // Reinicia o timer
+                _iniciarControleTempo(context);
+              }
+            },
+            child: Text('Desbloquear'),
+          ),
+        ],
+      ),
+    );
+  }
   @override
-  _MenuState createState() => _MenuState();
+  State<Menu> createState() => _MenuState();
 }
 
 class _MenuState extends State<Menu> {
+
   int _expandedIndex = -1;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget._iniciarControleTempo(context);
+    });
+  }
   void _toggleContainer(int index) {
     setState(() {
       _expandedIndex = _expandedIndex == index ? -1 : index;

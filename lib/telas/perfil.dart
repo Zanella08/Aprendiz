@@ -211,6 +211,65 @@ class PerfilScreen extends StatelessWidget {
             }
             Transicao(context, PerfilScreen());
           }),
+          SizedBox(height: 20),
+          _buildButton('Tempo de uso do aplicativo', () {
+            showDialog(
+              context: context,
+              builder:
+                  (context) => AlertDialog(
+                    title: Text('Definir Tempo de Uso'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Defina o tempo de uso do aplicativo (em minutos):'),
+                        SizedBox(height: 10),
+                        TextField(
+                          controller: TextEditingController(
+                            text: Global.tempo.toString(),
+                          ),
+                          decoration: InputDecoration(
+                            labelText: 'Tempo (minutos)',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Fecha o pop-up sem salvar
+                        },
+                        child: Text('Cancelar'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          final tempoText = (context as Element)
+                            .findAncestorWidgetOfExactType<AlertDialog>()!
+                            .content as Column;
+                          final textField = tempoText.children[1] as TextField;
+                          final input = textField.controller?.text ?? '';
+                          final tempo = int.tryParse(input);
+                          if (tempo != null && tempo > 0) {
+                            Global.tempo = tempo;
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Tempo atualizado para $tempo minutos!')),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Por favor, insira um valor válido.')),
+                            );
+                          }
+                          Transicao(context, PerfilScreen());
+                        },
+                        child: Text('Salvar'),
+                      ),
+                    ],
+                  ),
+            );
+          }),
         ],
       ),
     );
