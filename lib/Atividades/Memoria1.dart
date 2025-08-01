@@ -156,7 +156,7 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Conte a quantidade de \n vaquinhas e galinhas",
+                        "Conte a quantidade de \n vaquinhas e de galinhas",
                         style: TextStyle(
                           fontSize: 26,
                           fontFamily: "Oilvare",
@@ -189,7 +189,7 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Quantas vaquinhas você \n consegue lembrar?",
+                        "Quantas vaquinhas \n você viu?",
                         style: TextStyle(
                           fontSize: 26,
                           fontFamily: "Oilvare",

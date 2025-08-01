@@ -213,7 +213,38 @@ class PerfilScreen extends StatelessWidget {
           }),
           SizedBox(height: 20),
           _buildButton('Tempo de uso do aplicativo', () {
+            TextEditingController tempoController = TextEditingController(
+              text: Global.tempo != null ? Global.tempo.toString() : '',
+            );
+            TextEditingController segurancaController = TextEditingController();
             showDialog(
+              context: context,
+              builder:
+                  (context) => AlertDialog(
+                    title: Text('Tempo de Uso'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Confirme o código parental para definir o tempo de uso do aplicativo.'),
+                        SizedBox(height: 10),
+                        TextField( 
+                          controller: segurancaController,
+                          obscureText: true,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: "Digite o código parental",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  actions: [
+                      TextButton(
+                        onPressed: () {
+                          if (segurancaController.text == Global.codigoDesbloqueio) {
+                            showDialog(
               context: context,
               builder:
                   (context) => AlertDialog(
@@ -224,9 +255,8 @@ class PerfilScreen extends StatelessWidget {
                         Text('Defina o tempo de uso do aplicativo (em minutos):'),
                         SizedBox(height: 10),
                         TextField(
-                          controller: TextEditingController(
-                            text: Global.tempo.toString(),
-                          ),
+                          controller: tempoController,
+                          keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             labelText: 'Tempo (minutos)',
                             border: OutlineInputBorder(
@@ -245,21 +275,95 @@ class PerfilScreen extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () {
-                          final tempoText = (context as Element)
-                            .findAncestorWidgetOfExactType<AlertDialog>()!
-                            .content as Column;
-                          final textField = tempoText.children[1] as TextField;
-                          final input = textField.controller?.text ?? '';
-                          final tempo = int.tryParse(input);
-                          if (tempo != null && tempo > 0) {
-                            Global.tempo = tempo;
-                            Navigator.pop(context);
+                          if (tempoController.text.isNotEmpty) {
+                            Global.tempo = int.tryParse(tempoController.text) ?? 0;
+                          } else {
+                            Global.tempo = 0;
+                          }
+                          Global.inicioUso = DateTime.now();
+                          Global.bloqueado = false;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                Global.tempo >= 1
+                                    ? 'Tempo de uso definido para ${Global.tempo} minutos.'
+                                    : 'Tempo de uso definido para menos de 1 minuto.',
+                                
+                              ),
+                            ),
+                          );
+                          Navigator.pop(context);
+                          Transicao(context, PerfilScreen());
+                        },
+                        child: Text('Salvar'),
+                      ),
+                    ],
+                  ),
+            );
+                          } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Tempo atualizado para $tempo minutos!')),
+                              SnackBar(
+                                content: Text('Código incorreto!'),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text('Confirmar'),
+                      ),
+                  ],
+                ),);
+          }),
+        SizedBox(height: 20),
+         _buildButton('Definir o código parental', () {
+            TextEditingController codigoparental =
+                TextEditingController();
+            showDialog(
+              context: context,
+              builder:
+                  (context) => AlertDialog(
+                    title: Text('Redefinir Senha'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Digite sua nova senha:'),
+                        SizedBox(height: 10),
+                        TextField(
+                          controller: codigoparental,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: 'Novo Código Parental',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Fecha o pop-up sem salvar
+                        },
+                        child: Text('Cancelar'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          if (codigoparental.text.isNotEmpty &&
+                              codigoparental.text != Global.codigoDesbloqueio) {
+                            Global.codigoDesbloqueio = codigoparental.text;
+                            Navigator.pop(context); // Fecha o pop-up
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Código redefinido com sucesso!'),
+                              ),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Por favor, insira um valor válido.')),
+                              SnackBar(
+                                content: Text(
+                                  'Por favor, insira um código novo.',
+                                ),
+                              ),
                             );
                           }
                           Transicao(context, PerfilScreen());

@@ -1,8 +1,8 @@
 class Global {
-  static String username = '';
-  static String email = '';
-  static String password = '';
-  static String log = 'n';
+  static String username = 'Pietro';
+  static String email = 'rams@gmail.com';
+  static String password = 'asd';
+  static String log = 's';
   static int color = 0;
   static int colorback = 0;
   static int colorback2 = 0;

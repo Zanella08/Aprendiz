@@ -5,14 +5,16 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 class Menu extends StatefulWidget {
-
-
+  Timer? _timer;
 
   void _iniciarControleTempo(BuildContext context) {
-    if (Global.inicioUso == null) {
-      Global.inicioUso = DateTime.now();
-    }
-    Timer.periodic(Duration(seconds: 10), (timer) {
+    if (Global.tempo == 0) return;
+
+    // Cancela o timer anterior se existir
+    _timer?.cancel();
+
+    Global.inicioUso ??= DateTime.now();
+    _timer = Timer.periodic(Duration(seconds: 10), (timer) {
       if (Global.bloqueado) {
         timer.cancel();
         return;
@@ -55,8 +57,7 @@ class Menu extends StatefulWidget {
                 Global.bloqueado = false;
                 Global.inicioUso = DateTime.now();
                 Navigator.pop(context);
-                // Reinicia o timer
-                _iniciarControleTempo(context);
+                _iniciarControleTempo(context); // Reinicia o timer
               }
             },
             child: Text('Desbloquear'),
@@ -65,6 +66,7 @@ class Menu extends StatefulWidget {
       ),
     );
   }
+
   @override
   State<Menu> createState() => _MenuState();
 }

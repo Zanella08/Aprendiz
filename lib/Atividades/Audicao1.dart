@@ -137,7 +137,7 @@ class AudicaoActivityState extends State<AudicaoActivity> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Quais animalzinhos fazem esses sons?",
+                          Text("Quais animaizinhos fazem esses sons?",
                               style: TextStyle(
                                 fontSize: 17,
                                 fontFamily: "Oilvare",
