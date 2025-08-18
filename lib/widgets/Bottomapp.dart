@@ -45,6 +45,14 @@ BottomApp({
                   builder: (context) => warning2(context),
                 );
                 return;
+              }else if (Global.modoParental == true) {
+                showDialog(
+                  context: context,
+                  builder: (context) => Global.tentativas >= 3
+                      ? warning5Dialog(context)
+                      : warning4(context),
+                );
+                return;
               }
               Transicao(context, TelaDesempenho());
             },
@@ -52,10 +60,20 @@ BottomApp({
           ),
           IconButton(
             onPressed: () {
-              Transicao(
+              if (Global.modoParental == true) {
+                showDialog(
+                  context: context,
+                  builder: (context) => Global.tentativas >= 3
+                      ? warning5Dialog(context)
+                      : warning4(context),
+              );
+              }else{
+                Transicao(
                 context,
                 Global.log != 's' ? CadastroScreen() : PerfilScreen(),
               );
+              }
+              
             },
             icon: Icon(Icons.person, color: Colors.white, size: 40),
           ),
@@ -168,5 +186,111 @@ warning3(BuildContext context, {int Cor = 0}) {
         ),
       ),
     ],
+  );
+}
+warning4(BuildContext context) {
+  TextEditingController codigoparental = TextEditingController();
+  return AlertDialog(
+    title: Text('Confirmação'),
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('Digite o código parental para confirmação:'),
+        SizedBox(height: 10),
+        TextField(
+          controller: codigoparental,
+          obscureText: true,
+          decoration: InputDecoration(
+            labelText: 'Código Parental',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+      ],
+    ),
+    actions: [
+      TextButton(
+        onPressed: () {
+          Navigator.pop(context); // Fecha o pop-up sem salvar
+        },
+        child: Text('Cancelar'),
+      ),
+      TextButton(
+        onPressed: () {
+          if (codigoparental.text.isNotEmpty &&
+              codigoparental.text == Global.codigoDesbloqueio) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Modo parental desativado!'),
+              ),
+            );
+            Navigator.pop(context); // Fecha o pop-up
+            Global.modoParental = false;  
+            Global.tentativas = 0; // Reseta as tentativas
+          } else {
+            Global.tentativas++;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Código errado.',
+                ),
+              ),
+            );
+          
+          Navigator.pop(context); // Fecha o pop-up
+        }
+        },
+        child: Text('Continuar'),
+      ),
+    ],
+  );
+          }
+Widget warning5Dialog(BuildContext context) {
+  TextEditingController codigoController = TextEditingController();
+  return AlertDialog(
+    title: Text('Número de tentativas excedido'),
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('Insira o código para continuar usando o aplicativo:'),
+        SizedBox(height: 10),
+        TextField(
+          controller: codigoController,
+          decoration: InputDecoration(
+            labelText: 'Código',
+            border: OutlineInputBorder(),
+          ),
+          obscureText: true,
+        ),
+      ],
+    ),
+    actions: [
+      TextButton(
+        onPressed: () {
+          if (codigoController.text == Global.codigoDesbloqueio) {
+            Global.bloqueado = false;
+            Global.modoParental = false;
+            Global.tentativas = 0; // Reseta as tentativas
+            Global.inicioUso = DateTime.now();
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Modo parental desativado!'),
+              ),
+            );
+          }
+        },
+        child: Text('Desbloquear'),
+      ),
+    ],
+  );
+}
+
+void warning5(BuildContext context) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (context) => warning5Dialog(context),
   );
 }

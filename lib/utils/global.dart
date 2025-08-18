@@ -11,6 +11,8 @@ class Global {
   static int tempo = 0;
   static DateTime? inicioUso;
   static bool bloqueado = false;
-  static String codigoDesbloqueio = "1234";
+  static String codigoDesbloqueio = "";
+  static bool modoParental = false;
+  static int tentativas = 0;
 }
  

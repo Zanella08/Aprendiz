@@ -1,10 +1,13 @@
 import 'package:aprendiz/telas/Cadastro.dart';
 import 'package:aprendiz/telas/Login.dart';
-import 'package:aprendiz/telas/parental.dart';
+import 'package:aprendiz/telas/perfil.dart';
 import 'package:aprendiz/transitions/Transicao.dart';
 import 'package:aprendiz/utils/Style.dart';
 import 'package:aprendiz/utils/global.dart';
 import 'package:aprendiz/widgets/Bottomapp.dart';
+import 'package:aprendiz/widgets/Menu.dart';
+import 'package:aprendiz/widgets/modulo.dart';
+import 'package:aprendiz/widgets/modulos.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Perfil App',
+      title: 'Parental Control',
       theme: ThemeData(primarySwatch: Colors.purple),
       home: CadastroScreen(),
       debugShowCheckedModeBanner: false,
@@ -24,20 +27,10 @@ class MyApp extends StatelessWidget {
 }
 
 // ignore: must_be_immutable
-class PerfilScreen extends StatelessWidget {
-  final TextEditingController usernameController = TextEditingController(
-    text: Global.username,
-  );
-  final TextEditingController emailController = TextEditingController(
-    text: Global.email,
-  );
-  final TextEditingController passwordController = TextEditingController(
-    text: Global.password,
-  );
+class ParentalScreen extends StatelessWidget {
+  
 
-  bool _isPasswordVisible = false;
-
-  PerfilScreen({super.key});
+  ParentalScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -114,95 +107,81 @@ class PerfilScreen extends StatelessWidget {
       decoration: _boxDecoration(),
       child: Column(
         children: [
-          _buildTextField('Nome de Usuário', controller: usernameController),
-          _buildTextField('Email', controller: emailController),
-          _buildPasswordField(context),
+          _buildTextField('Tempo de uso de aplicativo', controller: TextEditingController(text: Global.tempo.toString() == '0' ? 'Não definido' : Global.tempo.toString() == "1" ?  '1 minuto' : '${Global.tempo} minutos')),
           SizedBox(height: 20),
-          _buildButton('Redefinir Senha', () {
-            TextEditingController newPasswordController =
+          _buildButton('Redefinir tempo de uso', () {
+            TextEditingController tempoController = TextEditingController(
+              text: Global.tempo != null ? Global.tempo.toString() : '',
+            );
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('Definir Tempo de Uso'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Defina o tempo de uso do aplicativo (em minutos):'),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: tempoController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Tempo (minutos)',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Fecha o pop-up sem salvar
+                    },
+                    child: Text('Cancelar'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      if (tempoController.text.isNotEmpty) {
+                        Global.tempo = int.tryParse(tempoController.text) ?? 0;
+                      } else {
+                        Global.tempo = 0;
+                      }
+                      Global.inicioUso = DateTime.now();
+                      Global.bloqueado = false;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            Global.tempo >= 1
+                                ? 'Tempo de uso definido para ${Global.tempo} minutos.'
+                                : 'Tempo de uso definido para menos de 1 minuto.',
+                          ),
+                        ),
+                      );
+                      Navigator.pop(context);
+                      Transicao(context, ParentalScreen());
+                    },
+                    child: Text('Salvar'),
+                  ),
+                ],
+              ),
+            );
+          }),
+        SizedBox(height: 20),
+        _buildTextField('Código Parental', controller: TextEditingController(text: Global.codigoDesbloqueio)),
+         _buildButton('Redefinir o código parental', () {
+            TextEditingController codigoparental =
                 TextEditingController();
             showDialog(
               context: context,
               builder:
                   (context) => AlertDialog(
-                    title: Text('Redefinir Senha'),
+                    title: Text('Redefinir código'),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Digite sua nova senha:'),
-                        SizedBox(height: 10),
-                        TextField(
-                          controller: newPasswordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            labelText: 'Nova Senha',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context); // Fecha o pop-up sem salvar
-                        },
-                        child: Text('Cancelar'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          if (newPasswordController.text.isNotEmpty &&
-                              newPasswordController.text != Global.password) {
-                            Global.password = newPasswordController.text;
-                            Navigator.pop(context); // Fecha o pop-up
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Senha redefinida com sucesso!'),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Por favor, insira uma nova senha.',
-                                ),
-                              ),
-                            );
-                          }
-                          Transicao(context, PerfilScreen());
-                        },
-                        child: Text('Salvar'),
-                      ),
-                    ],
-                  ),
-            );
-          }),
-          SizedBox(height: 20),
-          _buildButton('Modo Noturno', () {
-            if (Global.nightMode == false) {
-              Global.nightMode = true;
-            } else if (Global.nightMode == true) {
-              Global.nightMode = false;
-            } else {
-              Global.nightMode = false;
-            }
-            Transicao(context, PerfilScreen());
-          }),
-          SizedBox(height: 20),
-          _buildButton('Menu parental', () {
-            if (Global.codigoDesbloqueio.isEmpty) {
-              TextEditingController codigoparental =
-                TextEditingController();
-              showDialog(
-              context: context,
-              builder:
-                  (context) => AlertDialog(
-                    title: Text('Defina o Código Parental'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Para contituar a controlar o uso do aplicativo, você precisa definir o código parental.'),
+                        Text('Digite seu novo código:'),
                         SizedBox(height: 10),
                         TextField(
                           controller: codigoparental,
@@ -219,7 +198,7 @@ class PerfilScreen extends StatelessWidget {
                     actions: [
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(context); // Fecha o pop-up sem salvar
                         },
                         child: Text('Cancelar'),
                       ),
@@ -231,7 +210,7 @@ class PerfilScreen extends StatelessWidget {
                             Navigator.pop(context); // Fecha o pop-up
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Código definido com sucesso!'),
+                                content: Text('Código redefinido com sucesso!'),
                               ),
                             );
                           } else {
@@ -243,76 +222,55 @@ class PerfilScreen extends StatelessWidget {
                               ),
                             );
                           }
-                          Transicao(context, ParentalScreen());
+                          Transicao(context, PerfilScreen());
                         },
                         child: Text('Salvar'),
                       ),
                     ],
                   ),
             );
-            } else {
-              Transicao(context, ParentalScreen());
-            }
           }),
-          SizedBox(height: 20),
-          _buildButton('Sair da Conta', () {
-            showDialog(
+        SizedBox(height: 20),
+        _buildButton("Ativar o modo parental", () {
+          showDialog(
               context: context,
               builder:
                   (context) => AlertDialog(
-                    title: Text("Tem certeza que deseja sair?"),
-                    content: Text(
-                      "Ao confirmar, você confirma que deseja sair da conta e será redirecionado a tela de Login.",
+                    title: Text('Redefinir código'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Ao confirmar, você ativará o modo parental. \nOnde o aplicativo bloqueará o uso após o tempo definido e bloqueará o acesso a página de perfil e de desempenho.\nCaso não tenha definido um tempo de uso do aplicativo, apenas o acesso as páginas de perfil e desempenho serão bloqueadas. \n\n Deseja continuar?'),
+                      ],
                     ),
                     actions: [
                       TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text("Não"),
+                        onPressed: () {
+                          Navigator.pop(context); // Fecha o pop-up sem salvar
+                        },
+                        child: Text('Cancelar'),
                       ),
                       TextButton(
-                        onPressed: () => Transicao(context, LoginScreen()),
-                        child: Text("Sim"),
+                        onPressed: () {
+                          Global.modoParental = true;
+                          Transicao(context, Modulos());
+                        },
+                        child: Text('Salvar'),
                       ),
                     ],
                   ),
             );
-          }),
-          SizedBox(height: 20),
+        }
+        ),
+        SizedBox(height: 20),
+        _buildButton('Voltar', () {
+          Transicao(context, PerfilScreen());
+        }),
         ],
       ),
     );
   }
 
-  Widget _buildPasswordField(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 15),
-      child: TextField(
-        style: TextStyle(
-          color: Global.nightMode == false ? Colors.black : Colors.white,
-        ),
-        controller: passwordController,
-        readOnly: true,
-        obscureText: !_isPasswordVisible,
-        decoration: InputDecoration(
-          labelStyle: TextStyle(
-            color: Global.nightMode == false ? AppColors.prin2 : Colors.white,
-          ),
-          labelText: 'Senha',
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-          suffixIcon: IconButton(
-            icon: Icon(
-              color: Global.nightMode == false ? AppColors.prin2 : Colors.white,
-              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            ),
-            onPressed: () {
-              _isPasswordVisible = !_isPasswordVisible;
-              (context as Element).markNeedsBuild(); // Atualiza a tela
-            },
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildTextField(String label, {TextEditingController? controller}) {
     return Padding(
