@@ -41,8 +41,8 @@ class TelaFala extends StatelessWidget {
                   mainaxisA: MainAxisAlignment.center,
                   context: context,
                   Icone: Icons.star,
-                  cor: 4,
-                  cor2: 4,
+                  cor: 2,
+                  cor2: 2,
                   pathAtividade: FalaActivity(level: index),
                 );
               }),

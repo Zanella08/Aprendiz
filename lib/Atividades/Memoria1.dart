@@ -1,8 +1,9 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:aprendiz/telas/progresso_Memoria.dart';
 import 'package:aprendiz/transitions/Transicao.dart';
 import 'package:aprendiz/utils/Style.dart';
 import 'package:aprendiz/widgets/topodapagina.dart';
+import 'package:aprendiz/utils/audio_utils.dart';
+import 'package:aprendiz/widgets/completar a fase.dart'; // Importa completar_fase
 import 'package:flutter/material.dart';
 
 class MemoriaActivity extends StatefulWidget {
@@ -14,121 +15,13 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
   // Variáveis-----------------------------------------------------------------------------------
   String ok = "n";
   bool certo = false;
-  bool isPlaying = false;
-  AudioPlayer? _player;
-  String? _currentAudio;
   int? selectedAudioIndex;
   int? selectedImageIndex;
 
-  void setIsPlaying(bool value) {
-    setState(() {
-      isPlaying = value;
-    });
-  }
-
   @override
-  //Funções------------------------------------------------------------------------------------
-  void mostrarResultado(bool acertou) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: AppColors.g2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            title: Text(
-              acertou ? "Parabéns!" : "Que pena!",
-              style: TextStyle(
-                fontSize: 24,
-                fontFamily: "Oilvare",
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            content: Text(
-              acertou
-                  ? "Você acertou! Muito bem!"
-                  : "Você errou dessa vez, quer tentar de novo?",
-              style: TextStyle(
-                fontSize: 20,
-                fontFamily: "Oilvare",
-                color: Colors.white,
-              ),
-            ),
-            actions: [
-              if (!acertou)
-                TextButton(
-                  style: TextButton.styleFrom(backgroundColor: AppColors.g3),
-                  onPressed: () {
-                    Transicao(context, MemoriaActivity());
-                    setState(() {
-                      ok = "n";
-                      selectedAudioIndex = null;
-                      selectedImageIndex = null;
-                    });
-                  },
-                  child: Text(
-                    'Sim',
-                    style: TextStyle(fontSize: 15, color: Colors.white),
-                  ),
-                ),
-              TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor: AppColors.g3,
-                  textStyle: TextStyle(fontSize: 15, color: Colors.white),
-                ),
-                onPressed: () {
-                  if (acertou) {
-                    Transicao(context, TelaMemoria());
-                  } else {
-                    Transicao(context, TelaMemoria());
-                  }
-                },
-                child: Text(
-                  acertou ? 'Avançar' : 'Não',
-                  style: TextStyle(fontSize: 15, color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-    );
-  }
-
   void dispose() {
-    _player?.dispose();
+    AudioUtils.stopAudio(); // Para qualquer áudio tocando ao sair
     super.dispose();
-  }
-
-  Future<void> handleAudio(
-    String audioPath,
-    Function()? onAudioStart,
-    Function()? onAudioEnd,
-  ) async {
-    if (_player != null && isPlaying && _currentAudio == audioPath) {
-      await _player!.stop();
-      setState(() {
-        isPlaying = false;
-        _currentAudio = null;
-      });
-      onAudioEnd?.call();
-      return;
-    }
-
-    _player?.dispose();
-    _player = AudioPlayer();
-    setState(() {
-      isPlaying = true;
-      _currentAudio = audioPath;
-    });
-    onAudioStart?.call();
-    await _player!.play(AssetSource(audioPath));
-    await _player!.onPlayerComplete.first;
-    setState(() {
-      isPlaying = false;
-      _currentAudio = null;
-    });
-    onAudioEnd?.call();
   }
 
   //Código------------------------------------------------------------------------------------
@@ -167,10 +60,7 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                       IconButton(
                         icon: Icon(Icons.spatial_audio, color: Colors.white),
                         onPressed: () async {
-                          final player = AudioPlayer();
-                          await player.play(
-                            AssetSource('audios/Memoria_1.mp3'),
-                          );
+                          await AudioUtils.playAudio('audios/Memoria_1.mp3');
                         },
                       ),
                     ],
@@ -200,10 +90,7 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                       IconButton(
                         icon: Icon(Icons.spatial_audio, color: Colors.white),
                         onPressed: () async {
-                          final player = AudioPlayer();
-                          await player.play(
-                            AssetSource('audios/Memoria_2.mp3'),
-                          );
+                          await AudioUtils.playAudio('audios/Memoria_2.mp3');
                         },
                       ),
                     ],
@@ -278,7 +165,10 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                 ),
                               ),
                               onPressed: () {
-                                mostrarResultado(false);
+                                completar_fase(
+                                  '4', // módulo 4 = memória
+                                  "Você errou dessa vez, quer tentar de novo?",
+                                );
                               },
                               child: Container(
                                 width: 100,
@@ -309,7 +199,10 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                 ),
                               ),
                               onPressed: () {
-                                mostrarResultado(false);
+                                completar_fase(
+                                  '4',
+                                  "Você errou dessa vez, quer tentar de novo?",
+                                );
                               },
                               child: Container(
                                 width: 100,
@@ -346,7 +239,10 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                 ),
                               ),
                               onPressed: () {
-                                mostrarResultado(false);
+                                completar_fase(
+                                  '4',
+                                  "Você errou dessa vez, quer tentar de novo?",
+                                );
                               },
                               child: Container(
                                 width: 100,
@@ -377,7 +273,7 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                 ),
                               ),
                               onPressed: () {
-                                mostrarResultado(true);
+                                completar_fase('4', "Você acertou! Muito bem!");
                               },
                               child: Container(
                                 width: 100,
@@ -407,73 +303,4 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
       ),
     );
   }
-}
-
-Buttonass(
-  Widget icone,
-  String audioPath, {
-  required bool isPlaying,
-  required Function(bool) setIsPlaying,
-  AudioPlayer? player,
-  String? currentAudio,
-  required void Function(
-    String,
-    Function()? onAudioStart,
-    Function()? onAudioEnd,
-  )
-  handleAudio,
-  Color color = AppColors.g2,
-  VoidCallback? onTap,
-}) {
-  return ElevatedButton(
-    onPressed: () {
-      if (onTap != null) onTap();
-      if (isPlaying && currentAudio == audioPath) {
-        player?.stop();
-        setIsPlaying(false);
-      } else if (!isPlaying) {
-        handleAudio(
-          audioPath,
-          () => setIsPlaying(true),
-          () => setIsPlaying(false),
-        );
-      }
-    },
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.transparent,
-      padding: EdgeInsets.all(0),
-      shadowColor: Colors.transparent,
-    ),
-    child: Container(
-      height: 80,
-      width: 100,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.g1, width: 2),
-      ),
-      child: Center(child: icone),
-    ),
-  );
-}
-
-Buttonass2(Widget icone, {Color color = AppColors.g2, VoidCallback? onTap}) {
-  return ElevatedButton(
-    onPressed: onTap,
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.transparent,
-      padding: EdgeInsets.all(0),
-      shadowColor: Colors.transparent,
-    ),
-    child: Container(
-      height: 80,
-      width: 120,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.g1, width: 2),
-      ),
-      child: Center(child: icone),
-    ),
-  );
 }
