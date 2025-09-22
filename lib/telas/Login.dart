@@ -3,7 +3,8 @@ import 'package:aprendiz/utils/Style.dart';
 import 'package:aprendiz/utils/global.dart';
 import 'package:aprendiz/widgets/modulos.dart';
 import 'package:flutter/material.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 void main() {
   runApp(MyApp());
 }
@@ -21,10 +22,8 @@ class MyApp extends StatelessWidget {
 }
 
 class LoginScreen extends StatelessWidget {
-  // Controladores para os campos de texto
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -81,14 +80,14 @@ class LoginScreen extends StatelessWidget {
       decoration: _boxDecoration(),
       child: Column(
         children: [
-          _buildTextField('Nome de usuário', controller: usernameController),
-          _buildTextField('Senha',
-              isPassword: true, controller: passwordController),
+          _buildTextField('Email ou nome de usuário', controller: usernameController),
+          _buildTextField('Senha', isPassword: true, controller: passwordController),
           SizedBox(height: 20),
-          _buildButton('Entrar', () {
-            // Verificação dos campos
-            if (usernameController.text.isEmpty &&
-                passwordController.text.isEmpty) {
+          _buildButton('Entrar', () async {
+            String loginInput = usernameController.text.trim().toLowerCase();
+            String passwordInput = passwordController.text;
+
+            if (loginInput.isEmpty || passwordInput.isEmpty) {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
@@ -102,57 +101,59 @@ class LoginScreen extends StatelessWidget {
                   ],
                 ),
               );
-            } else {
-              if (usernameController.text != Global.username &&
-                  passwordController.text != Global.password) {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('Inválido'),
-                    content: Text('Nome de usuário e senha incorretos.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text('OK'),
-                      ),
-                    ],
-                  ),
-                );
-              } else if (usernameController.text != Global.username) {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('Inválido'),
-                    content: Text('Nome de usuário incorreto.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text('OK'),
-                      ),
-                    ],
-                  ),
-                );
-              } else if (passwordController.text != Global.password) {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('Inválido'),
-                    content: Text('Senha incorreta.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text('OK'),
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                Global.log = 's';
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Modulos()),
-                );
+              return;
+            }
+
+            try {
+              String emailToUse = loginInput;
+
+              // Se não for email, procura pelo nome de usuário no Firestore
+              if (!loginInput.contains('@')) {
+                var userQuery = await FirebaseFirestore.instance
+                    .collection('usuarios')
+                    .where('username', isEqualTo: loginInput)
+                    .limit(1)
+                    .get();
+
+                if (userQuery.docs.isEmpty) {
+                  throw Exception('Usuário não encontrado');
+                }
+                emailToUse = userQuery.docs.first['email'];
               }
+
+              // Autentica com Firebase Auth
+              await FirebaseAuth.instance.signInWithEmailAndPassword(
+                email: emailToUse,
+                password: passwordInput,
+              );
+              Global.log = "s";
+              Global.islogged = true;
+              Global.username = loginInput;
+              Global.password = passwordInput;
+              Global.email = emailToUse;
+              // Login bem-sucedido
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Modulos()),
+              );
+              await FirebaseFirestore.instance
+    .collection('usuarios')
+    .doc(FirebaseAuth.instance.currentUser!.uid)
+    .update({'islogged': true});
+            } catch (e) {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Erro'),
+                  content: Text('Falha no login: ${e.toString()}'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('OK'),
+                    ),
+                  ],
+                ),
+              );
             }
           }),
         ],

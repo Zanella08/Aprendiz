@@ -5,6 +5,8 @@ import 'package:aprendiz/transitions/Transicao.dart';
 import 'package:aprendiz/utils/Style.dart';
 import 'package:aprendiz/utils/global.dart';
 import 'package:aprendiz/widgets/Bottomapp.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -269,10 +271,17 @@ class PerfilScreen extends StatelessWidget {
                         onPressed: () => Navigator.pop(context),
                         child: Text("Não"),
                       ),
-                      TextButton(
-                        onPressed: () => Transicao(context, LoginScreen()),
-                        child: Text("Sim"),
-                      ),
+TextButton(
+  onPressed: () async {
+    await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update({'islogged': false});
+    await FirebaseAuth.instance.signOut();
+    Transicao(context, LoginScreen());
+  },
+  child: Text("Sim"),
+),
                     ],
                   ),
             );

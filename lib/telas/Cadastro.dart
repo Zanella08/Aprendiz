@@ -2,6 +2,9 @@ import 'package:aprendiz/telas/Login.dart';
 import 'package:aprendiz/utils/Style.dart';
 import 'package:aprendiz/utils/global.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class CadastroScreen extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
@@ -68,62 +71,91 @@ class CadastroScreen extends StatelessWidget {
           _buildTextField('Confirme sua senha',
               isPassword: true, controller: confpasswordController),
           SizedBox(height: 20),
-          _buildButton('Cadastrar', () {
-            if (usernameController.text.isEmpty ||
-                passwordController.text.isEmpty ||
-                emailController.text.isEmpty ||
-                confpasswordController.text.isEmpty) {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('Inválido'),
-                  content: Text('Por favor, preencha todos os campos'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('OK'),
-                    ),
-                  ],
-                ),
-              );
-            } else if (passwordController.text != confpasswordController.text) {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('Inválido'),
-                  content: Text('As senhas são diferentes'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('OK'),
-                    ),
-                  ],
-                ),
-              );
-            } else if (!emailController.text.contains("@")) {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('Inválido'),
-                  content: Text('Email não contém @'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('OK'),
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              Global.username = usernameController.text;
-              Global.email = emailController.text;
-              Global.password = passwordController.text;
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-              );
-            }
-          })
+          _buildButton('Cadastrar', () async {
+  if (usernameController.text.isEmpty ||
+      passwordController.text.isEmpty ||
+      emailController.text.isEmpty ||
+      confpasswordController.text.isEmpty) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Inválido'),
+        content: Text('Por favor, preencha todos os campos'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  } else if (passwordController.text != confpasswordController.text) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Inválido'),
+        content: Text('As senhas são diferentes'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  } else if (!emailController.text.contains("@")) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Inválido'),
+        content: Text('Email não contém @'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  } else {
+    try {
+      // Cria usuário no Firebase Auth
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: emailController.text,
+              password: passwordController.text);
+
+      // Salva dados adicionais no Firestore
+      await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(userCredential.user!.uid)
+          .set({
+        'username': usernameController.text.trim().toLowerCase(),
+        'email': emailController.text,
+        'nome': nameController.text,
+      });
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Erro'),
+          content: Text('Falha ao cadastrar: $e'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+})
         ],
       ),
     );

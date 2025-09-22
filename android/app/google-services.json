@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "891939906457",
+    "project_id": "aprendiz-d08a7",
+    "storage_bucket": "aprendiz-d08a7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:891939906457:android:83ccc57780bb73f3262908",
+        "android_client_info": {
+          "package_name": "com.example.aprendiz"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8mFuaNfjWA18n3yJ6x2iAn67KPRRsNSg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
