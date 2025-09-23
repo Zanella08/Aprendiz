@@ -54,11 +54,12 @@ class LoginScreen extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-            height: 70,
-            child: Image.asset(
-              "assets/imagens/aprendiz-p.png",
-              fit: BoxFit.cover,
-            )),
+          height: 70,
+          child: Image.asset(
+            "assets/imagens/aprendiz-p.png",
+            fit: BoxFit.cover,
+          ),
+        ),
         SizedBox(height: 20),
         Icon(icon, size: 80, color: AppColors.prin1),
         Text(
@@ -81,8 +82,15 @@ class LoginScreen extends StatelessWidget {
       decoration: _boxDecoration(),
       child: Column(
         children: [
-          _buildTextField('Email ou nome de usuário', controller: usernameController),
-          _buildTextField('Senha', isPassword: true, controller: passwordController),
+          _buildTextField(
+            'Email ou nome de usuário',
+            controller: usernameController,
+          ),
+          _buildTextField(
+            'Senha',
+            isPassword: true,
+            controller: passwordController,
+          ),
           SizedBox(height: 20),
           _buildButton('Entrar', () async {
             String loginInput = usernameController.text.trim().toLowerCase();
@@ -91,16 +99,17 @@ class LoginScreen extends StatelessWidget {
             if (loginInput.isEmpty || passwordInput.isEmpty) {
               showDialog(
                 context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('Inválido'),
-                  content: Text('Por favor, preencha todos os campos'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('OK'),
+                builder:
+                    (context) => AlertDialog(
+                      title: Text('Inválido'),
+                      content: Text('Por favor, preencha todos os campos'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('OK'),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
               );
               return;
             }
@@ -109,14 +118,20 @@ class LoginScreen extends StatelessWidget {
             try {
               // Se não for email, procura pelo nome de usuário no Firestore
               if (!loginInput.contains('@')) {
-                var userQuery = await FirebaseFirestore.instance
-                    .collection('usuarios')
-                    .where('username', isEqualTo: loginInput)
-                    .limit(1)
-                    .get();
+                var userQuery =
+                    await FirebaseFirestore.instance
+                        .collection('usuarios')
+                        .where('username', isEqualTo: loginInput)
+                        .limit(1)
+                        .get();
 
                 if (userQuery.docs.isEmpty) {
-                  await _mostrarErro(context, loginInput, passwordInput, 'username');
+                  await _mostrarErro(
+                    context,
+                    loginInput,
+                    passwordInput,
+                    'username',
+                  );
                   return;
                 }
                 emailToUse = userQuery.docs.first['email'];
@@ -153,8 +168,11 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String label,
-      {bool isPassword = false, TextEditingController? controller}) {
+  Widget _buildTextField(
+    String label, {
+    bool isPassword = false,
+    TextEditingController? controller,
+  }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 15),
       child: TextField(
@@ -226,25 +244,32 @@ class LoginScreen extends StatelessWidget {
 
 // Funções auxiliares para verificar existência de usuário/email
 Future<bool> _usuarioExiste(String username) async {
-  var userQuery = await FirebaseFirestore.instance
-      .collection('usuarios')
-      .where('username', isEqualTo: username)
-      .limit(1)
-      .get();
+  var userQuery =
+      await FirebaseFirestore.instance
+          .collection('usuarios')
+          .where('username', isEqualTo: username)
+          .limit(1)
+          .get();
   return userQuery.docs.isNotEmpty;
 }
 
 Future<bool> _emailExiste(String email) async {
-  var userQuery = await FirebaseFirestore.instance
-      .collection('usuarios')
-      .where('email', isEqualTo: email)
-      .limit(1)
-      .get();
+  var userQuery =
+      await FirebaseFirestore.instance
+          .collection('usuarios')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
   return userQuery.docs.isNotEmpty;
 }
 
 // Função para mostrar erro detalhado
-Future<void> _mostrarErro(BuildContext context, String loginInput, String passwordInput, dynamic error) async {
+Future<void> _mostrarErro(
+  BuildContext context,
+  String loginInput,
+  String passwordInput,
+  dynamic error,
+) async {
   String mensagem = 'Falha no login';
 
   if (error == 'username') {
@@ -252,15 +277,22 @@ Future<void> _mostrarErro(BuildContext context, String loginInput, String passwo
   } else if (error is FirebaseAuthException && error.code == 'wrong-password') {
     mensagem = 'Senha incorreta';
   } else if (error is FirebaseAuthException && error.code == 'user-not-found') {
-    mensagem = loginInput.contains('@') ? 'Email não encontrado' : 'Nome de usuário não encontrado';
+    mensagem =
+        loginInput.contains('@')
+            ? 'Email não encontrado'
+            : 'Nome de usuário não encontrado';
   } else {
     // Verifica se o usuário existe para detalhar o erro
-    bool usuarioExiste = loginInput.contains('@')
-        ? await _emailExiste(loginInput)
-        : await _usuarioExiste(loginInput);
+    bool usuarioExiste =
+        loginInput.contains('@')
+            ? await _emailExiste(loginInput)
+            : await _usuarioExiste(loginInput);
 
     if (!usuarioExiste) {
-      mensagem = loginInput.contains('@') ? 'Email não encontrado' : 'Nome de usuário não encontrado';
+      mensagem =
+          loginInput.contains('@')
+              ? 'Email não encontrado'
+              : 'Nome de usuário não encontrado';
     } else {
       mensagem = 'Senha incorreta';
     }
@@ -268,15 +300,16 @@ Future<void> _mostrarErro(BuildContext context, String loginInput, String passwo
 
   showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Erro'),
-      content: Text(mensagem),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('OK'),
+    builder:
+        (context) => AlertDialog(
+          title: Text('Erro'),
+          content: Text(mensagem),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
         ),
-      ],
-    ),
   );
 }

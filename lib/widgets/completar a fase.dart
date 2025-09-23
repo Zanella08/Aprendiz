@@ -8,56 +8,54 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 completar_fase(BuildContext context, String modulo, String texto1) async {
-  // Toca o áudio ao abrir o diálogo
   final player = AudioPlayer();
-  await player.play(AssetSource('assets/audio/completa.mp3'));
+  await player.play(AssetSource('completa.mp3'));
 
-  return AlertDialog(
+  await showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      backgroundColor:
+        modulo == '1'
+            ? AppColors.v2
+            : modulo == '2'
+            ? AppColors.b2
+            : modulo == '3'
+            ? AppColors.y2
+            : AppColors.g2,
+    title: Text(
+      'Parabéns!',
+      style: TextStyle(color: Colors.white, fontSize: 25),
+    ),
+    content: Text(texto1, style: TextStyle(color: Colors.white, fontSize: 18)),
+    actions: [
+      TextButton(
+        style: TextButton.styleFrom(
           backgroundColor:
               modulo == '1'
-                  ? AppColors.v2
+                  ? AppColors.v3
                   : modulo == '2'
-                  ? AppColors.b2
+                  ? AppColors.b3
                   : modulo == '3'
-                  ? AppColors.y2
-                  : AppColors.g2,
-          title: Text(
-            'Parabéns!',
-            style: TextStyle(color: Colors.white, fontSize: 25),
-          ),
-          content: Text(
-            texto1,
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
-          actions: [
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor:
-                    modulo == '1'
-                        ? AppColors.v3
-                        : modulo == '2'
-                        ? AppColors.b3
-                        : modulo == '3'
-                        ? AppColors.y3
-                        : AppColors.g3,
-              ),
-              onPressed: () {
-                Transicao(
-                  context,
-                  modulo == '1'
-                      ? TelaAudicao()
-                      : modulo == '2'
-                      ? TelaFala()
-                      : modulo == '3'
-                      ? TelaAssimilacao()
-                      : TelaMemoria(),
-                );
-              },
-              child: Text(
-                'Continuar',
-                style: TextStyle(color: Colors.white, fontSize: 15),
-              ),
-            ),
-          ],
-  );
+                  ? AppColors.y3
+                  : AppColors.g3,
+        ),
+        onPressed: () {
+          Transicao(
+            context,
+            modulo == '1'
+                ? TelaAudicao()
+                : modulo == '2'
+                ? TelaFala()
+                : modulo == '3'
+                ? TelaAssimilacao()
+                : TelaMemoria(),
+          );
+        },
+        child: Text(
+          'Continuar',
+          style: TextStyle(color: Colors.white, fontSize: 15),
+        ),
+      ),
+    ],
+  ),);
 }

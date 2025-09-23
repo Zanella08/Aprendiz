@@ -15,8 +15,11 @@ class CadastroScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar:
-          _buildNavigationButton(context, "Já possuo cadastro", LoginScreen()),
+      bottomNavigationBar: _buildNavigationButton(
+        context,
+        "Já possuo cadastro",
+        LoginScreen(),
+      ),
       body: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -36,11 +39,12 @@ class CadastroScreen extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-            height: 70,
-            child: Image.asset(
-              "assets/imagens/aprendiz-p.png",
-              fit: BoxFit.cover,
-            )),
+          height: 70,
+          child: Image.asset(
+            "assets/imagens/aprendiz-p.png",
+            fit: BoxFit.cover,
+          ),
+        ),
         SizedBox(height: 20),
         Icon(icon, size: 80, color: AppColors.prin1),
         Text(
@@ -65,8 +69,16 @@ class CadastroScreen extends StatelessWidget {
         children: [
           _buildTextField('Nome de usuário', controller: usernameController),
           _buildTextField('Email', controller: emailController),
-          _buildTextField('Senha', isPassword: true, controller: passwordController),
-          _buildTextField('Confirme sua senha', isPassword: true, controller: confpasswordController),
+          _buildTextField(
+            'Senha',
+            isPassword: true,
+            controller: passwordController,
+          ),
+          _buildTextField(
+            'Confirme sua senha',
+            isPassword: true,
+            controller: confpasswordController,
+          ),
           SizedBox(height: 20),
           _buildButton('Cadastrar', () async {
             String username = usernameController.text.trim().toLowerCase();
@@ -77,9 +89,14 @@ class CadastroScreen extends StatelessWidget {
 
             String mensagemErro = "";
 
-            if (username.isEmpty || email.isEmpty || password.isEmpty || confPassword.isEmpty) {
+            if (username.isEmpty ||
+                email.isEmpty ||
+                password.isEmpty ||
+                confPassword.isEmpty) {
               mensagemErro = "Por favor, preencha todos os campos.";
-            } else if (!email.contains("@") || !email.contains(".") || email.length < 6) {
+            } else if (!email.contains("@") ||
+                !email.contains(".") ||
+                email.length < 6) {
               mensagemErro = "Email inválido.";
             } else if (password.length < 6) {
               mensagemErro = "A senha deve ter pelo menos 6 caracteres.";
@@ -87,20 +104,22 @@ class CadastroScreen extends StatelessWidget {
               mensagemErro = "As senhas são diferentes.";
             } else {
               // Verifica se o email já está cadastrado
-              var emailQuery = await FirebaseFirestore.instance
-                  .collection('usuarios')
-                  .where('email', isEqualTo: email)
-                  .limit(1)
-                  .get();
+              var emailQuery =
+                  await FirebaseFirestore.instance
+                      .collection('usuarios')
+                      .where('email', isEqualTo: email)
+                      .limit(1)
+                      .get();
               if (emailQuery.docs.isNotEmpty) {
                 mensagemErro = "Este email já está cadastrado.";
               }
               // Verifica se o nome de usuário já está cadastrado
-              var userQuery = await FirebaseFirestore.instance
-                  .collection('usuarios')
-                  .where('username', isEqualTo: username)
-                  .limit(1)
-                  .get();
+              var userQuery =
+                  await FirebaseFirestore.instance
+                      .collection('usuarios')
+                      .where('username', isEqualTo: username)
+                      .limit(1)
+                      .get();
               if (userQuery.docs.isNotEmpty) {
                 mensagemErro = "Este nome de usuário já está cadastrado.";
               }
@@ -109,16 +128,17 @@ class CadastroScreen extends StatelessWidget {
             if (mensagemErro.isNotEmpty) {
               showDialog(
                 context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('Erro'),
-                  content: Text(mensagemErro),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('OK'),
+                builder:
+                    (context) => AlertDialog(
+                      title: Text('Erro'),
+                      content: Text(mensagemErro),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('OK'),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
               );
               return;
             }
@@ -127,37 +147,37 @@ class CadastroScreen extends StatelessWidget {
               // Cria usuário no Firebase Auth
               UserCredential userCredential = await FirebaseAuth.instance
                   .createUserWithEmailAndPassword(
-                      email: email,
-                      password: password);
+                    email: email,
+                    password: password,
+                  );
 
               // Salva dados adicionais no Firestore
               await FirebaseFirestore.instance
                   .collection('usuarios')
                   .doc(userCredential.user!.uid)
-                  .set({
-                'username': username,
-                'email': email,
-                'nome': nome,
-              });
+                  .set({'username': username, 'email': email, 'nome': nome});
 
               showDialog(
                 context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('Sucesso'),
-                  content: Text('Cadastro realizado com sucesso!'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginScreen()),
-                        );
-                      },
-                      child: Text('OK'),
+                builder:
+                    (context) => AlertDialog(
+                      title: Text('Sucesso'),
+                      content: Text('Cadastro realizado com sucesso!'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginScreen(),
+                              ),
+                            );
+                          },
+                          child: Text('OK'),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
               );
             } catch (e) {
               String erroMsg = "Falha ao cadastrar.";
@@ -172,16 +192,17 @@ class CadastroScreen extends StatelessWidget {
               }
               showDialog(
                 context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('Erro'),
-                  content: Text(erroMsg),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('OK'),
+                builder:
+                    (context) => AlertDialog(
+                      title: Text('Erro'),
+                      content: Text(erroMsg),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('OK'),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
               );
             }
           }),
@@ -190,8 +211,11 @@ class CadastroScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String label,
-      {TextEditingController? controller, bool isPassword = false}) {
+  Widget _buildTextField(
+    String label, {
+    TextEditingController? controller,
+    bool isPassword = false,
+  }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 15),
       child: TextField(
@@ -251,11 +275,7 @@ class CadastroScreen extends StatelessWidget {
       borderRadius: BorderRadius.circular(15),
       border: Border.all(color: AppColors.prin1, width: 2),
       boxShadow: [
-        BoxShadow(
-          color: AppColors.prin1,
-          blurRadius: 5,
-          offset: Offset(2, 2),
-        ),
+        BoxShadow(color: AppColors.prin1, blurRadius: 5, offset: Offset(2, 2)),
       ],
     );
   }

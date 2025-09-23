@@ -165,13 +165,11 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                 ),
                               ),
                               onPressed: () {
-                                showDialog(context: context, builder: 
-                                
                                 completar_fase(
                                   context,
-                                  '4', // módulo 4 = memória
+                                  '4',
                                   "Você errou dessa vez, quer tentar de novo?",
-                                ),);
+                                );
                               },
                               child: Container(
                                 width: 100,
@@ -202,13 +200,11 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                 ),
                               ),
                               onPressed: () {
-                                showDialog(context: context, builder: 
-                                
                                 completar_fase(
                                   context,
-                                  '4', // módulo 4 = memória
+                                  '4',
                                   "Você errou dessa vez, quer tentar de novo?",
-                                ),);
+                                );
                               },
                               child: Container(
                                 width: 100,
@@ -245,14 +241,12 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                 ),
                               ),
                               onPressed: () {
-                                showDialog(context: context, builder: 
-                                
-                                completar_fase(
-                                  context,
-                                  '4', // módulo 4 = memória
-                                  "Você errou dessa vez, quer tentar de novo?",
-                                ),);
-                              },
+  completar_fase(
+    context,
+    '4',
+    "Você errou dessa vez, quer tentar de novo?",
+  );
+},
                               child: Container(
                                 width: 100,
                                 height: 100,
@@ -282,15 +276,12 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                 ),
                               ),
                               onPressed: () {
-                                showDialog(context: context, builder: 
-                                
-                                completar_fase(
-                                  context,
-                                  '4', // módulo 4 = memória
-                                  "Você acertou! Muito bem!",
-                                ),);
-
-                              },
+  completar_fase(
+    context,
+    '4',
+    "Você acertou! Parabéns por completar a atividade.",
+  );
+},
                               child: Container(
                                 width: 100,
                                 height: 100,
