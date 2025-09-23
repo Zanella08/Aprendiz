@@ -1,10 +1,8 @@
 import 'package:aprendiz/telas/Login.dart';
 import 'package:aprendiz/utils/Style.dart';
-import 'package:aprendiz/utils/global.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 
 class CadastroScreen extends StatelessWidget {
   final TextEditingController usernameController = TextEditingController();
@@ -12,6 +10,7 @@ class CadastroScreen extends StatelessWidget {
   final TextEditingController confpasswordController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,13 +36,13 @@ class CadastroScreen extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-                  height: 70,
-                  child: Image.asset(
-                    "assets/imagens/aprendiz-p.png",
-                    fit: BoxFit.cover,
-                  )),
+            height: 70,
+            child: Image.asset(
+              "assets/imagens/aprendiz-p.png",
+              fit: BoxFit.cover,
+            )),
         SizedBox(height: 20),
-        Icon(icon, size: 80, color:AppColors.prin1),
+        Icon(icon, size: 80, color: AppColors.prin1),
         Text(
           title,
           style: TextStyle(
@@ -66,96 +65,126 @@ class CadastroScreen extends StatelessWidget {
         children: [
           _buildTextField('Nome de usuário', controller: usernameController),
           _buildTextField('Email', controller: emailController),
-          _buildTextField('Senha',
-              isPassword: true, controller: passwordController),
-          _buildTextField('Confirme sua senha',
-              isPassword: true, controller: confpasswordController),
+          _buildTextField('Senha', isPassword: true, controller: passwordController),
+          _buildTextField('Confirme sua senha', isPassword: true, controller: confpasswordController),
           SizedBox(height: 20),
           _buildButton('Cadastrar', () async {
-  if (usernameController.text.isEmpty ||
-      passwordController.text.isEmpty ||
-      emailController.text.isEmpty ||
-      confpasswordController.text.isEmpty) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Inválido'),
-        content: Text('Por favor, preencha todos os campos'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
-  } else if (passwordController.text != confpasswordController.text) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Inválido'),
-        content: Text('As senhas são diferentes'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
-  } else if (!emailController.text.contains("@")) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Inválido'),
-        content: Text('Email não contém @'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
-  } else {
-    try {
-      // Cria usuário no Firebase Auth
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-              email: emailController.text,
-              password: passwordController.text);
+            String username = usernameController.text.trim().toLowerCase();
+            String email = emailController.text.trim();
+            String password = passwordController.text;
+            String confPassword = confpasswordController.text;
+            String nome = nameController.text.trim();
 
-      // Salva dados adicionais no Firestore
-      await FirebaseFirestore.instance
-          .collection('usuarios')
-          .doc(userCredential.user!.uid)
-          .set({
-        'username': usernameController.text.trim().toLowerCase(),
-        'email': emailController.text,
-        'nome': nameController.text,
-      });
+            String mensagemErro = "";
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-      );
-    } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Erro'),
-          content: Text('Falha ao cadastrar: $e'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-})
+            if (username.isEmpty || email.isEmpty || password.isEmpty || confPassword.isEmpty) {
+              mensagemErro = "Por favor, preencha todos os campos.";
+            } else if (!email.contains("@") || !email.contains(".") || email.length < 6) {
+              mensagemErro = "Email inválido.";
+            } else if (password.length < 6) {
+              mensagemErro = "A senha deve ter pelo menos 6 caracteres.";
+            } else if (password != confPassword) {
+              mensagemErro = "As senhas são diferentes.";
+            } else {
+              // Verifica se o email já está cadastrado
+              var emailQuery = await FirebaseFirestore.instance
+                  .collection('usuarios')
+                  .where('email', isEqualTo: email)
+                  .limit(1)
+                  .get();
+              if (emailQuery.docs.isNotEmpty) {
+                mensagemErro = "Este email já está cadastrado.";
+              }
+              // Verifica se o nome de usuário já está cadastrado
+              var userQuery = await FirebaseFirestore.instance
+                  .collection('usuarios')
+                  .where('username', isEqualTo: username)
+                  .limit(1)
+                  .get();
+              if (userQuery.docs.isNotEmpty) {
+                mensagemErro = "Este nome de usuário já está cadastrado.";
+              }
+            }
+
+            if (mensagemErro.isNotEmpty) {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Erro'),
+                  content: Text(mensagemErro),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('OK'),
+                    ),
+                  ],
+                ),
+              );
+              return;
+            }
+
+            try {
+              // Cria usuário no Firebase Auth
+              UserCredential userCredential = await FirebaseAuth.instance
+                  .createUserWithEmailAndPassword(
+                      email: email,
+                      password: password);
+
+              // Salva dados adicionais no Firestore
+              await FirebaseFirestore.instance
+                  .collection('usuarios')
+                  .doc(userCredential.user!.uid)
+                  .set({
+                'username': username,
+                'email': email,
+                'nome': nome,
+              });
+
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Sucesso'),
+                  content: Text('Cadastro realizado com sucesso!'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginScreen()),
+                        );
+                      },
+                      child: Text('OK'),
+                    ),
+                  ],
+                ),
+              );
+            } catch (e) {
+              String erroMsg = "Falha ao cadastrar.";
+              if (e is FirebaseAuthException) {
+                if (e.code == 'email-already-in-use') {
+                  erroMsg = "Este email já está cadastrado.";
+                } else if (e.code == 'invalid-email') {
+                  erroMsg = "Email inválido.";
+                } else if (e.code == 'weak-password') {
+                  erroMsg = "A senha é muito fraca.";
+                }
+              }
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Erro'),
+                  content: Text(erroMsg),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('OK'),
+                    ),
+                  ],
+                ),
+              );
+            }
+          }),
         ],
       ),
     );

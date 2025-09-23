@@ -5,6 +5,7 @@ import 'package:aprendiz/widgets/modulos.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Cadastro App',
       theme: ThemeData(primarySwatch: Colors.purple),
-      home: CadastroScreen(),
+      home: LoginScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -104,9 +105,8 @@ class LoginScreen extends StatelessWidget {
               return;
             }
 
+            String emailToUse = loginInput;
             try {
-              String emailToUse = loginInput;
-
               // Se não for email, procura pelo nome de usuário no Firestore
               if (!loginInput.contains('@')) {
                 var userQuery = await FirebaseFirestore.instance
@@ -116,7 +116,8 @@ class LoginScreen extends StatelessWidget {
                     .get();
 
                 if (userQuery.docs.isEmpty) {
-                  throw Exception('Usuário não encontrado');
+                  await _mostrarErro(context, loginInput, passwordInput, 'username');
+                  return;
                 }
                 emailToUse = userQuery.docs.first['email'];
               }
@@ -126,34 +127,25 @@ class LoginScreen extends StatelessWidget {
                 email: emailToUse,
                 password: passwordInput,
               );
+
               Global.log = "s";
               Global.islogged = true;
               Global.username = loginInput;
               Global.password = passwordInput;
               Global.email = emailToUse;
-              // Login bem-sucedido
-              Navigator.push(
+
+              // Atualiza status no Firestore
+              await FirebaseFirestore.instance
+                  .collection('usuarios')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .update({'islogged': true});
+
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => Modulos()),
               );
-              await FirebaseFirestore.instance
-    .collection('usuarios')
-    .doc(FirebaseAuth.instance.currentUser!.uid)
-    .update({'islogged': true});
             } catch (e) {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('Erro'),
-                  content: Text('Falha no login: ${e.toString()}'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('OK'),
-                    ),
-                  ],
-                ),
-              );
+              await _mostrarErro(context, loginInput, passwordInput, e);
             }
           }),
         ],
@@ -230,4 +222,61 @@ class LoginScreen extends StatelessWidget {
       ],
     );
   }
+}
+
+// Funções auxiliares para verificar existência de usuário/email
+Future<bool> _usuarioExiste(String username) async {
+  var userQuery = await FirebaseFirestore.instance
+      .collection('usuarios')
+      .where('username', isEqualTo: username)
+      .limit(1)
+      .get();
+  return userQuery.docs.isNotEmpty;
+}
+
+Future<bool> _emailExiste(String email) async {
+  var userQuery = await FirebaseFirestore.instance
+      .collection('usuarios')
+      .where('email', isEqualTo: email)
+      .limit(1)
+      .get();
+  return userQuery.docs.isNotEmpty;
+}
+
+// Função para mostrar erro detalhado
+Future<void> _mostrarErro(BuildContext context, String loginInput, String passwordInput, dynamic error) async {
+  String mensagem = 'Falha no login';
+
+  if (error == 'username') {
+    mensagem = 'Nome de usuário não encontrado';
+  } else if (error is FirebaseAuthException && error.code == 'wrong-password') {
+    mensagem = 'Senha incorreta';
+  } else if (error is FirebaseAuthException && error.code == 'user-not-found') {
+    mensagem = loginInput.contains('@') ? 'Email não encontrado' : 'Nome de usuário não encontrado';
+  } else {
+    // Verifica se o usuário existe para detalhar o erro
+    bool usuarioExiste = loginInput.contains('@')
+        ? await _emailExiste(loginInput)
+        : await _usuarioExiste(loginInput);
+
+    if (!usuarioExiste) {
+      mensagem = loginInput.contains('@') ? 'Email não encontrado' : 'Nome de usuário não encontrado';
+    } else {
+      mensagem = 'Senha incorreta';
+    }
+  }
+
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Erro'),
+      content: Text(mensagem),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('OK'),
+        ),
+      ],
+    ),
+  );
 }

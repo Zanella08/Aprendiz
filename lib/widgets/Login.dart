@@ -1,4 +1,3 @@
-import 'package:aprendiz/utils/global.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -49,7 +48,6 @@ class _MyWidgetState extends State<widgetLogin> {
           actions: [
             TextButton(
               onPressed: () {
-                Global.log = "s";
                 Navigator.pop(context);
               },
               child: Text('OK'),

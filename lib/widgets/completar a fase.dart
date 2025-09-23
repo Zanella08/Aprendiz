@@ -7,17 +7,12 @@ import 'package:aprendiz/utils/Style.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
-completar_fase(String modulo, String texto1) async {
-  var context;
-
+completar_fase(BuildContext context, String modulo, String texto1) async {
   // Toca o áudio ao abrir o diálogo
   final player = AudioPlayer();
   await player.play(AssetSource('assets/audio/completa.mp3'));
 
-  return showDialog(
-    context: context,
-    builder:
-        (context) => AlertDialog(
+  return AlertDialog(
           backgroundColor:
               modulo == '1'
                   ? AppColors.v2
@@ -64,6 +59,5 @@ completar_fase(String modulo, String texto1) async {
               ),
             ),
           ],
-        ),
   );
 }
