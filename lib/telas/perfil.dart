@@ -1,4 +1,3 @@
-import 'package:aprendiz/telas/Cadastro.dart';
 import 'package:aprendiz/telas/Login.dart';
 import 'package:aprendiz/telas/parental.dart';
 import 'package:aprendiz/transitions/Transicao.dart';
@@ -9,37 +8,42 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Perfil App',
-      theme: ThemeData(primarySwatch: Colors.purple),
-      home: CadastroScreen(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
-// ignore: must_be_immutable
-class PerfilScreen extends StatelessWidget {
-  final TextEditingController usernameController = TextEditingController(
-    text: Global.username,
-  );
-  final TextEditingController emailController = TextEditingController(
-    text: Global.email,
-  );
-  final TextEditingController passwordController = TextEditingController(
-    text: Global.password,
-  );
-
-  bool _isPasswordVisible = false;
-
+class PerfilScreen extends StatefulWidget {
   PerfilScreen({super.key});
+
+  @override
+  State<PerfilScreen> createState() => _PerfilScreenState();
+}
+
+class _PerfilScreenState extends State<PerfilScreen> {
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarDadosUsuario();
+  }
+
+  Future<void> _carregarDadosUsuario() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('usuarios')
+              .doc(user.uid)
+              .get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        setState(() {
+          usernameController.text = data['username'] ?? '';
+          emailController.text = data['email'] ?? '';
+          passwordController.text = data['password'] ?? '';
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +99,7 @@ class PerfilScreen extends StatelessWidget {
             Icon(Icons.person_outlined, size: 60, color: appcolor2()),
             SizedBox(width: 10),
             Text(
-              Global.username,
+              usernameController.text,
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
@@ -117,208 +121,152 @@ class PerfilScreen extends StatelessWidget {
       child: Column(
         children: [
           _buildTextField('Nome de Usuário', controller: usernameController),
+          SizedBox(height: 20),
           _buildTextField('Email', controller: emailController),
-          _buildPasswordField(context),
           SizedBox(height: 20),
-          _buildButton('Redefinir Senha', () {
-            TextEditingController newPasswordController =
-                TextEditingController();
-            showDialog(
-              context: context,
-              builder:
-                  (context) => AlertDialog(
-                    title: Text('Redefinir Senha'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Digite sua nova senha:'),
-                        SizedBox(height: 10),
-                        TextField(
-                          controller: newPasswordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            labelText: 'Nova Senha',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context); // Fecha o pop-up sem salvar
-                        },
-                        child: Text('Cancelar'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          if (newPasswordController.text.isNotEmpty &&
-                              newPasswordController.text != Global.password) {
-                            Global.password = newPasswordController.text;
-                            Navigator.pop(context); // Fecha o pop-up
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Senha redefinida com sucesso!'),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Por favor, insira uma nova senha.',
-                                ),
-                              ),
-                            );
-                          }
-                          Transicao(context, PerfilScreen());
-                        },
-                        child: Text('Salvar'),
-                      ),
-                    ],
-                  ),
-            );
-          }),
-          SizedBox(height: 20),
-          _buildButton('Modo Noturno', () {
-            if (Global.nightMode == false) {
-              Global.nightMode = true;
-            } else if (Global.nightMode == true) {
-              Global.nightMode = false;
-            } else {
-              Global.nightMode = false;
-            }
-            Transicao(context, PerfilScreen());
-          }),
-          SizedBox(height: 20),
-          _buildButton('Menu parental', () {
-            if (Global.codigoDesbloqueio.isEmpty) {
-              TextEditingController codigoparental =
-                TextEditingController();
-              showDialog(
-              context: context,
-              builder:
-                  (context) => AlertDialog(
-                    title: Text('Defina o Código Parental'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Para contituar a controlar o uso do aplicativo, você precisa definir o código parental.'),
-                        SizedBox(height: 10),
-                        TextField(
-                          controller: codigoparental,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            labelText: 'Novo Código Parental',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text('Cancelar'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          if (codigoparental.text.isNotEmpty &&
-                              codigoparental.text != Global.codigoDesbloqueio) {
-                            Global.codigoDesbloqueio = codigoparental.text;
-                            Navigator.pop(context); // Fecha o pop-up
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Código definido com sucesso!'),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Por favor, insira um código novo.',
-                                ),
-                              ),
-                            );
-                          }
-                          Transicao(context, ParentalScreen());
-                        },
-                        child: Text('Salvar'),
-                      ),
-                    ],
-                  ),
-            );
-            } else {
-              Transicao(context, ParentalScreen());
-            }
-          }),
-          SizedBox(height: 20),
-          _buildButton('Sair da Conta', () {
-            showDialog(
-              context: context,
-              builder:
-                  (context) => AlertDialog(
-                    title: Text("Tem certeza que deseja sair?"),
-                    content: Text(
-                      "Ao confirmar, você confirma que deseja sair da conta e será redirecionado a tela de Login.",
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text("Não"),
-                      ),
-TextButton(
-  onPressed: () async {
-    await FirebaseFirestore.instance
-        .collection('usuarios')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .update({'islogged': false});
-    await FirebaseAuth.instance.signOut();
-    Transicao(context, LoginScreen());
-  },
-  child: Text("Sim"),
-),
-                    ],
-                  ),
-            );
-          }),
-          SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPasswordField(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 15),
-      child: TextField(
-        style: TextStyle(
-          color: Global.nightMode == false ? Colors.black : Colors.white,
-        ),
-        controller: passwordController,
-        readOnly: true,
-        obscureText: !_isPasswordVisible,
-        decoration: InputDecoration(
-          labelStyle: TextStyle(
-            color: Global.nightMode == false ? AppColors.prin2 : Colors.white,
-          ),
-          labelText: 'Senha',
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-          suffixIcon: IconButton(
-            icon: Icon(
-              color: Global.nightMode == false ? AppColors.prin2 : Colors.white,
-              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+          ExpansionTile(
+            title: Text(
+              'Opções de Conta',
+              style: TextStyle(
+                fontSize: 18,
+                color: Global.nightMode ? Colors.white : AppColors.prin1,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            onPressed: () {
-              _isPasswordVisible = !_isPasswordVisible;
-              (context as Element).markNeedsBuild(); // Atualiza a tela
-            },
+            children: [
+              _buildButton('Redefinir Senha', () async {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null && user.email != null) {
+                  await FirebaseAuth.instance.sendPasswordResetEmail(
+                    email: user.email!,
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Email de redefinição de senha enviado para ${user.email}!',
+                      ),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Não foi possível enviar o email de redefinição.',
+                      ),
+                    ),
+                  );
+                }
+              }),
+              SizedBox(height: 10),
+              _buildButton('Modo Noturno', () {
+                Global.nightMode = !Global.nightMode;
+                Transicao(context, PerfilScreen());
+              }),
+              SizedBox(height: 10),
+              _buildButton('Menu parental', () {
+                if (Global.codigoDesbloqueio.isEmpty) {
+                  TextEditingController codigoparental =
+                      TextEditingController();
+                  showDialog(
+                    context: context,
+                    builder:
+                        (context) => AlertDialog(
+                          title: Text('Defina o Código Parental'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Para continuar a controlar o uso do aplicativo, você precisa definir o código parental.',
+                              ),
+                              SizedBox(height: 10),
+                              TextField(
+                                controller: codigoparental,
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  labelText: 'Novo Código Parental',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('Cancelar'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                if (codigoparental.text.isNotEmpty &&
+                                    codigoparental.text !=
+                                        Global.codigoDesbloqueio) {
+                                  Global.codigoDesbloqueio =
+                                      codigoparental.text;
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Código definido com sucesso!',
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Por favor, insira um código novo.',
+                                      ),
+                                    ),
+                                  );
+                                }
+                                Transicao(context, ParentalScreen());
+                              },
+                              child: Text('Salvar'),
+                            ),
+                          ],
+                        ),
+                  );
+                } else {
+                  Transicao(context, ParentalScreen());
+                }
+              }),
+              SizedBox(height: 10),
+              _buildButton('Sair da Conta', () {
+                showDialog(
+                  context: context,
+                  builder:
+                      (context) => AlertDialog(
+                        title: Text("Tem certeza que deseja sair?"),
+                        content: Text(
+                          "Ao confirmar, você confirma que deseja sair da conta e será redirecionado a tela de Login.",
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text("Não"),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              await FirebaseFirestore.instance
+                                  .collection('usuarios')
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .update({'islogged': false});
+                              await FirebaseAuth.instance.signOut();
+                              Transicao(context, LoginScreen());
+                            },
+                            child: Text("Sim"),
+                          ),
+                        ],
+                      ),
+                );
+              }),
+              SizedBox(height: 10),
+            ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -363,13 +311,6 @@ TextButton(
         color: Global.nightMode == false ? AppColors.prin1 : Colors.white,
         width: 2,
       ),
-      boxShadow: [
-        BoxShadow(
-          color: appcolor2().withOpacity(0.2),
-          blurRadius: 5,
-          offset: Offset(2, 2),
-        ),
-      ],
     );
   }
 }

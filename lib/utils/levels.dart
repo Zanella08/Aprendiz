@@ -45,15 +45,14 @@ List<List<Map<String, dynamic>>> fala = [
   //   {"img": "", "speak": "Caderno"},
   //   {"img": "", "speak": "Livro"},
   // ],
-
   // [
-  //   {"level": 4, "theme": 'Diga os nomes das frutas'},
-  //   {"img": "", "speak": "Maçã"},
-  //   {"img": "", "speak": "Banana"},
-  //   {"img": "", "speak": "Laranja"},
-  //   {"img": "", "speak": "Uva"},
-  //   {"img": "", "speak": "Morango"},
-  // ],
+  //{"level": 4, "theme": 'Diga os nomes das frutas'},
+  //{"img": "", "speak": "Maçã"},
+  //{"img": "", "speak": "Banana"},
+  //{"img": "", "speak": "Laranja"},
+  //{"img": "", "speak": "Uva"},
+  //{"img": "", "speak": "Morango"},
+  //],
 
   // [
   //   {"level": 5, "theme": 'Diga os nomes das formas geométricas'},
@@ -62,5 +61,5 @@ List<List<Map<String, dynamic>>> fala = [
   //   {"img": "", "speak": "triângulo"},
   //   {"img": "", "speak": "retângulo"},
   //   {"img": "", "speak": "losango"},
-  // ],
+  // ],''
 ];

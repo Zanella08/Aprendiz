@@ -1,7 +1,5 @@
 import 'package:aprendiz/transitions/Transicao.dart';
 import 'package:aprendiz/utils/Style.dart';
-import 'package:aprendiz/utils/global.dart';
-import 'package:aprendiz/widgets/Bottomapp.dart';
 import 'package:flutter/material.dart';
 
 Button({

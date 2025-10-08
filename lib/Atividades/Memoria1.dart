@@ -1,5 +1,3 @@
-import 'package:aprendiz/telas/progresso_Memoria.dart';
-import 'package:aprendiz/transitions/Transicao.dart';
 import 'package:aprendiz/utils/Style.dart';
 import 'package:aprendiz/widgets/topodapagina.dart';
 import 'package:aprendiz/utils/audio_utils.dart';
@@ -241,12 +239,12 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                 ),
                               ),
                               onPressed: () {
-  completar_fase(
-    context,
-    '4',
-    "Você errou dessa vez, quer tentar de novo?",
-  );
-},
+                                completar_fase(
+                                  context,
+                                  '4',
+                                  "Você errou dessa vez, quer tentar de novo?",
+                                );
+                              },
                               child: Container(
                                 width: 100,
                                 height: 100,
@@ -276,12 +274,12 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                 ),
                               ),
                               onPressed: () {
-  completar_fase(
-    context,
-    '4',
-    "Você acertou! Parabéns por completar a atividade.",
-  );
-},
+                                completar_fase(
+                                  context,
+                                  '4',
+                                  "Você acertou! Parabéns por completar a atividade.",
+                                );
+                              },
                               child: Container(
                                 width: 100,
                                 height: 100,

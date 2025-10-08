@@ -200,7 +200,24 @@ class _FalaActivityState extends State<FalaActivity> {
             const SizedBox(height: 10),
             isListening
                 ? const Text("Te escutando 😁")
-                : ElevatedButton(onPressed: listen, child: const Text("Falar")),
+                : ElevatedButton(
+                  onPressed: listen,
+                  child: const Text(
+                    "Falar",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.b2,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
           ],
         ),
       ),

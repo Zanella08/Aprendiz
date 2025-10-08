@@ -1,12 +1,9 @@
 import 'package:aprendiz/telas/Cadastro.dart';
-import 'package:aprendiz/telas/Login.dart';
 import 'package:aprendiz/telas/perfil.dart';
 import 'package:aprendiz/transitions/Transicao.dart';
 import 'package:aprendiz/utils/Style.dart';
 import 'package:aprendiz/utils/global.dart';
 import 'package:aprendiz/widgets/Bottomapp.dart';
-import 'package:aprendiz/widgets/Menu.dart';
-import 'package:aprendiz/widgets/modulo.dart';
 import 'package:aprendiz/widgets/modulos.dart';
 import 'package:flutter/material.dart';
 
@@ -28,8 +25,6 @@ class MyApp extends StatelessWidget {
 
 // ignore: must_be_immutable
 class ParentalScreen extends StatelessWidget {
-  
-
   ParentalScreen({super.key});
 
   @override
@@ -107,72 +102,89 @@ class ParentalScreen extends StatelessWidget {
       decoration: _boxDecoration(),
       child: Column(
         children: [
-          _buildTextField('Tempo de uso de aplicativo', controller: TextEditingController(text: Global.tempo.toString() == '0' ? 'Não definido' : Global.tempo.toString() == "1" ?  '1 minuto' : '${Global.tempo} minutos')),
+          _buildTextField(
+            'Tempo de uso de aplicativo',
+            controller: TextEditingController(
+              text:
+                  Global.tempo.toString() == '0'
+                      ? 'Não definido'
+                      : Global.tempo.toString() == "1"
+                      ? '1 minuto'
+                      : '${Global.tempo} minutos',
+            ),
+          ),
           SizedBox(height: 20),
           _buildButton('Redefinir tempo de uso', () {
             TextEditingController tempoController = TextEditingController(
+              // ignore: unnecessary_null_comparison
               text: Global.tempo != null ? Global.tempo.toString() : '',
             );
             showDialog(
               context: context,
-              builder: (context) => AlertDialog(
-                title: Text('Definir Tempo de Uso'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Defina o tempo de uso do aplicativo (em minutos):'),
-                    SizedBox(height: 10),
-                    TextField(
-                      controller: tempoController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText: 'Tempo (minutos)',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+              builder:
+                  (context) => AlertDialog(
+                    title: Text('Definir Tempo de Uso'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Defina o tempo de uso do aplicativo (em minutos):',
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Fecha o pop-up sem salvar
-                    },
-                    child: Text('Cancelar'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      if (tempoController.text.isNotEmpty) {
-                        Global.tempo = int.tryParse(tempoController.text) ?? 0;
-                      } else {
-                        Global.tempo = 0;
-                      }
-                      Global.inicioUso = DateTime.now();
-                      Global.bloqueado = false;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            Global.tempo >= 1
-                                ? 'Tempo de uso definido para ${Global.tempo} minutos.'
-                                : 'Tempo de uso definido para menos de 1 minuto.',
+                        SizedBox(height: 10),
+                        TextField(
+                          controller: tempoController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Tempo (minutos)',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                         ),
-                      );
-                      Navigator.pop(context);
-                      Transicao(context, ParentalScreen());
-                    },
-                    child: Text('Salvar'),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Fecha o pop-up sem salvar
+                        },
+                        child: Text('Cancelar'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          if (tempoController.text.isNotEmpty) {
+                            Global.tempo =
+                                int.tryParse(tempoController.text) ?? 0;
+                          } else {
+                            Global.tempo = 0;
+                          }
+                          Global.inicioUso = DateTime.now();
+                          Global.bloqueado = false;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                Global.tempo >= 1
+                                    ? 'Tempo de uso definido para ${Global.tempo} minutos.'
+                                    : 'Tempo de uso definido para menos de 1 minuto.',
+                              ),
+                            ),
+                          );
+                          Navigator.pop(context);
+                          Transicao(context, ParentalScreen());
+                        },
+                        child: Text('Salvar'),
+                      ),
+                    ],
                   ),
-                ],
-              ),
             );
           }),
-        SizedBox(height: 20),
-        _buildTextField('Código Parental', controller: TextEditingController(text: Global.codigoDesbloqueio)),
-         _buildButton('Redefinir o código parental', () {
-            TextEditingController codigoparental =
-                TextEditingController();
+          SizedBox(height: 20),
+          _buildTextField(
+            'Código Parental',
+            controller: TextEditingController(text: Global.codigoDesbloqueio),
+          ),
+          _buildButton('Redefinir o código parental', () {
+            TextEditingController codigoparental = TextEditingController();
             showDialog(
               context: context,
               builder:
@@ -230,9 +242,9 @@ class ParentalScreen extends StatelessWidget {
                   ),
             );
           }),
-        SizedBox(height: 20),
-        _buildButton("Ativar o modo parental", () {
-          showDialog(
+          SizedBox(height: 20),
+          _buildButton("Ativar o modo parental", () {
+            showDialog(
               context: context,
               builder:
                   (context) => AlertDialog(
@@ -240,7 +252,9 @@ class ParentalScreen extends StatelessWidget {
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Ao confirmar, você ativará o modo parental. \nOnde o aplicativo bloqueará o uso após o tempo definido e bloqueará o acesso a página de perfil e de desempenho.\nCaso não tenha definido um tempo de uso do aplicativo, apenas o acesso as páginas de perfil e desempenho serão bloqueadas. \n\n Deseja continuar?'),
+                        Text(
+                          'Ao confirmar, você ativará o modo parental. \nOnde o aplicativo bloqueará o uso após o tempo definido e bloqueará o acesso a página de perfil e de desempenho.\nCaso não tenha definido um tempo de uso do aplicativo, apenas o acesso as páginas de perfil e desempenho serão bloqueadas. \n\n Deseja continuar?',
+                        ),
                       ],
                     ),
                     actions: [
@@ -260,17 +274,15 @@ class ParentalScreen extends StatelessWidget {
                     ],
                   ),
             );
-        }
-        ),
-        SizedBox(height: 20),
-        _buildButton('Voltar', () {
-          Transicao(context, PerfilScreen());
-        }),
+          }),
+          SizedBox(height: 20),
+          _buildButton('Voltar', () {
+            Transicao(context, PerfilScreen());
+          }),
         ],
       ),
     );
   }
-
 
   Widget _buildTextField(String label, {TextEditingController? controller}) {
     return Padding(
