@@ -2,21 +2,44 @@ import 'package:aprendiz/telas/perfil.dart';
 import 'package:aprendiz/utils/Style.dart';
 import 'package:aprendiz/utils/global.dart';
 import 'package:aprendiz/widgets/Bottomapp.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 
 class TelaDesempenho extends StatelessWidget {
+  Future<Map<String, dynamic>> fetchDesempenho() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final doc = await FirebaseFirestore.instance.collection('desempenho').doc(uid).get();
+    return doc.data() ?? {};
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Global.nightMode == true ? AppColors.prin2 : Colors.white,
-      bottomNavigationBar: BottomApp(context: context, cor3: AppColors.prin1, ismenu: false),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-           Center(
+    return FutureBuilder<Map<String, dynamic>>(
+      future: fetchDesempenho(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+        final desempenho = snapshot.data!;
+        double getRazao(String modulo) {
+          final dados = desempenho[modulo] ?? {};
+          final acertos = (dados['acertos'] ?? 0) as int;
+          final erros = (dados['erros'] ?? 0) as int;
+          final total = acertos + erros;
+          return total == 0 ? 0 : acertos / total;
+        }
+
+        return Scaffold(
+          backgroundColor: Global.nightMode == true ? AppColors.prin2 : Colors.white,
+          bottomNavigationBar: BottomApp(context: context, cor3: AppColors.prin1, ismenu: false),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+               Center(
   child: Global.nightMode == false ? Image.asset(
     "assets/imagens/aprendiz-p.png",
     height: 50,
@@ -25,56 +48,49 @@ class TelaDesempenho extends StatelessWidget {
     height: 50,
   ),
 ),
-            SizedBox(height: 20),
-            SizedBox(height: 50),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(width: 20),
-            Icon(Icons.person_outlined, size: 60, color: appcolor2()),
-            SizedBox(width: 10),
-            Text(
-              Global.username,
-              style: TextStyle(
-                fontSize: 27,
-                fontWeight: FontWeight.bold,
-                color: appcolor2(),
-              ),
-            ),
-          ],
-        ),
-            SizedBox(height: 30),
-
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                border: Border.all(color: Global.nightMode == false ? AppColors.prin1 : Colors.white, width: 2),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Text(
-                      "Desempenho",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Global.nightMode == false ? AppColors.prin1 : Colors.white,
-                      ),
-                    ),
+                SizedBox(height: 20),
+                SizedBox(height: 50),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(width: 20),
+                Icon(Icons.person_outlined, size: 60, color: appcolor2()),
+                SizedBox(width: 10),
+                Text(
+                  Global.username,
+                  style: TextStyle(
+                    fontSize: 27,
+                    fontWeight: FontWeight.bold,
+                    color: appcolor2(),
                   ),
-                  SizedBox(height: 20),
-                  DesempenhoBarra(nome: "Audição", cor: Colors.red, porcentagem: 1),
-                  DesempenhoBarra(nome: "Fala", cor: Colors.lightBlue, porcentagem: 1),
-                  DesempenhoBarra(nome: "Assimilação", cor: Colors.amber, porcentagem: 1),
-                  DesempenhoBarra(nome: "Memória", cor: Colors.lightGreen, porcentagem: 1),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+                SizedBox(height: 30),
+
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Global.nightMode == false ? AppColors.prin1 : Colors.white, width: 2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(child: Text("Desempenho", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Global.nightMode == false ? AppColors.prin1 : Colors.white))),
+                      SizedBox(height: 20),
+                      DesempenhoBarra(nome: "Audição", cor: Colors.red, porcentagem: getRazao("audicao")),
+                      DesempenhoBarra(nome: "Fala", cor: Colors.lightBlue, porcentagem: getRazao("fala")),
+                      DesempenhoBarra(nome: "Assimilação", cor: Colors.amber, porcentagem: getRazao("assimilacao")),
+                      DesempenhoBarra(nome: "Memória", cor: Colors.lightGreen, porcentagem: getRazao("memoria")),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -118,7 +134,7 @@ class DesempenhoBarra extends StatelessWidget {
             ),
             Container(
               height: 20,
-              width: MediaQuery.of(context).size.width * 0.75 * porcentagem,
+              width: MediaQuery.of(context).size.width * 1 * porcentagem,
               decoration: BoxDecoration(
                 color: cor,
                 borderRadius: BorderRadius.circular(20),

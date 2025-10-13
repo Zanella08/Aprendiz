@@ -4,6 +4,8 @@ import 'package:aprendiz/widgets/Bottomapp.dart';
 import 'package:aprendiz/widgets/Menu.dart';
 import 'package:aprendiz/widgets/topodapagina.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Modulos extends StatefulWidget {
   @override
@@ -11,6 +13,25 @@ class Modulos extends StatefulWidget {
 }
 
 class _ModulosState extends State<Modulos> {
+  @override
+  void initState() {
+    super.initState();
+    _carregarModoNoturno();
+  }
+
+  Future<void> _carregarModoNoturno() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(user.uid)
+          .get();
+      setState(() {
+        Global.nightMode = doc.data()?['nightMode'] ?? false;
+      });
+    }
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Global.nightMode == true

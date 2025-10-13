@@ -23,7 +23,21 @@ class _PerfilScreenState extends State<PerfilScreen> {
   @override
   void initState() {
     super.initState();
+    _carregarModoNoturno();
     _carregarDadosUsuario();
+  }
+
+  Future<void> _carregarModoNoturno() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(user.uid)
+          .get();
+      setState(() {
+        Global.nightMode = doc.data()?['nightMode'] ?? false;
+      });
+    }
   }
 
   Future<void> _carregarDadosUsuario() async {
@@ -158,8 +172,18 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 }
               }),
               SizedBox(height: 10),
-              _buildButton('Modo Noturno', () {
-                Global.nightMode = !Global.nightMode;
+              _buildButton('Modo Noturno', () async {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  final novoModo = !(Global.nightMode);
+                  await FirebaseFirestore.instance
+                      .collection('usuarios')
+                      .doc(user.uid)
+                      .update({'nightMode': novoModo});
+                  setState(() {
+                    Global.nightMode = novoModo;
+                  });
+                }
                 Transicao(context, PerfilScreen());
               }),
               SizedBox(height: 10),
@@ -239,14 +263,15 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   context: context,
                   builder:
                       (context) => AlertDialog(
-                        title: Text("Tem certeza que deseja sair?"),
+                        backgroundColor: appcolor(),
+                        title: Text("Tem certeza que deseja sair?", style: TextStyle(color: appcolor2()),),
                         content: Text(
-                          "Ao confirmar, você confirma que deseja sair da conta e será redirecionado a tela de Login.",
+                          "Ao confirmar, você confirma que deseja sair da conta e será redirecionado a tela de Login.", style: TextStyle(color: appcolor2()),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text("Não"),
+                            child: Text("Não", style: TextStyle(color: appcolor2()),),
                           ),
                           TextButton(
                             onPressed: () async {
@@ -257,7 +282,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                               await FirebaseAuth.instance.signOut();
                               Transicao(context, LoginScreen());
                             },
-                            child: Text("Sim"),
+                            child: Text("Sim", style: TextStyle(color: appcolor2()),),
                           ),
                         ],
                       ),

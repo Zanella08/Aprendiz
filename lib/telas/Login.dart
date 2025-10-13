@@ -22,9 +22,16 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  bool _showPassword = false;
 
   @override
   Widget build(BuildContext context) {
@@ -82,14 +89,17 @@ class LoginScreen extends StatelessWidget {
       decoration: _boxDecoration(),
       child: Column(
         children: [
-          _buildTextField(
-            'Email ou nome de usuário',
-            controller: usernameController,
-          ),
+          _buildTextField('Email ou nome de usuário', controller: usernameController),
           _buildTextField(
             'Senha',
             isPassword: true,
             controller: passwordController,
+            showPassword: _showPassword,
+            togglePassword: () {
+              setState(() {
+                _showPassword = !_showPassword;
+              });
+            },
           ),
           SizedBox(height: 20),
           _buildButton('Entrar', () async {
@@ -170,17 +180,27 @@ class LoginScreen extends StatelessWidget {
 
   Widget _buildTextField(
     String label, {
-    bool isPassword = false,
     TextEditingController? controller,
+    bool isPassword = false,
+    bool showPassword = false,
+    VoidCallback? togglePassword,
   }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 15),
       child: TextField(
         controller: controller,
-        obscureText: isPassword,
+        obscureText: isPassword && !showPassword,
         decoration: InputDecoration(
           labelText: label,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    showPassword ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  onPressed: togglePassword,
+                )
+              : null,
         ),
       ),
     );

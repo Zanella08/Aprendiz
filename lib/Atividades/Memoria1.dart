@@ -1,7 +1,10 @@
 import 'package:aprendiz/utils/Style.dart';
+import 'package:aprendiz/widgets/BottomAppAtividade.dart';
 import 'package:aprendiz/widgets/topodapagina.dart';
 import 'package:aprendiz/utils/audio_utils.dart';
 import 'package:aprendiz/widgets/completar a fase.dart'; // Importa completar_fase
+import 'package:aprendiz/utils/desempenho_utils.dart'; // Adicione o import
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 class MemoriaActivity extends StatefulWidget {
@@ -28,283 +31,329 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
     return Scaffold(
       backgroundColor: AppColors.g1,
       appBar: Toppagina(cor4: AppColors.g2),
-      body: Container(
-        color: AppColors.g1,
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            children: [
-              if (ok == "n") ...[
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.g2,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.g1, width: 2),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Conte a quantidade de \n vaquinhas e de galinhas",
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontFamily: "Oilvare",
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.spatial_audio, color: Colors.white),
-                        onPressed: () async {
-                          await AudioUtils.playAudio('audios/Memoria_1.mp3');
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ] else ...[
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.g2,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.g1, width: 2),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Quantas vaquinhas \n você viu?",
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontFamily: "Oilvare",
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.spatial_audio, color: Colors.white),
-                        onPressed: () async {
-                          await AudioUtils.playAudio('audios/Memoria_2.mp3');
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-
-              SizedBox(height: 20),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      bottomNavigationBar: BottomAppAtividade(
+        context: context,
+        cor: AppColors.g2,
+      ),
+      body: Stack(
+        children: [
+          SizedBox.expand(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
                 children: [
-                  SizedBox(height: 50),
                   if (ok == "n") ...[
-                    SizedBox(
-                      width: 300,
-                      child: Image.asset(
-                        'assets/imagens/Fazenda.jpg',
-                        fit: BoxFit.cover,
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.g2,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.g1, width: 2),
                       ),
-                    ),
-                    SizedBox(height: 50),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.g2,
-                        padding: EdgeInsets.all(10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(color: AppColors.g1, width: 2),
-                        ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          ok == "n" ? ok = "s" : ok = "n";
-                          selectedAudioIndex = null;
-                          selectedImageIndex = null;
-                        });
-                      },
-                      child: Container(
-                        width: 120,
-                        height: 50,
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Pronto!",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontFamily: "Oilvare",
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Conte a quantidade de \n vaquinhas e de galinhas",
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontFamily: "Oilvare",
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.spatial_audio,
+                              color: Colors.white,
+                            ),
+                            onPressed: () async {
+                              await AudioUtils.playAudio(
+                                'audios/Memoria_1.mp3',
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ] else ...[
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.g2,
-                                padding: EdgeInsets.all(10),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  side: BorderSide(
-                                    color: AppColors.g1,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                              onPressed: () {
-                                completar_fase(
-                                  context,
-                                  '4',
-                                  "Você errou dessa vez, quer tentar de novo?",
-                                );
-                              },
-                              child: Container(
-                                width: 100,
-                                height: 100,
-                                alignment: Alignment.center,
-                                child: Text(
-                                  "1",
-                                  style: TextStyle(
-                                    fontSize: 35,
-                                    fontFamily: "Oilvare",
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.g2,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.g1, width: 2),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Muito bem! Agora, \n toque na resposta certa",
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontFamily: "Oilvare",
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                            SizedBox(height: 20, width: 20),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.g2,
-                                padding: EdgeInsets.all(10),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  side: BorderSide(
-                                    color: AppColors.g1,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                              onPressed: () {
-                                completar_fase(
-                                  context,
-                                  '4',
-                                  "Você errou dessa vez, quer tentar de novo?",
-                                );
-                              },
-                              child: Container(
-                                width: 100,
-                                height: 100,
-                                alignment: Alignment.center,
-                                child: Text(
-                                  "2",
-                                  style: TextStyle(
-                                    fontSize: 35,
-                                    fontFamily: "Oilvare",
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.spatial_audio,
+                              color: Colors.white,
                             ),
-                          ],
+                            onPressed: () async {
+                              await AudioUtils.playAudio(
+                                'audios/Memoria_2.mp3',
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  SizedBox(height: 20),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(height: 50),
+                      if (ok == "n") ...[
+                        SizedBox(
+                          width: 300,
+                          child: Image.asset(
+                            'assets/imagens/Fazenda.jpg',
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                        SizedBox(height: 20),
-                        Row(
+                        SizedBox(height: 50),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.g2,
+                            padding: EdgeInsets.all(10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(color: AppColors.g1, width: 2),
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              ok == "n" ? ok = "s" : ok = "n";
+                              selectedAudioIndex = null;
+                              selectedImageIndex = null;
+                            });
+                          },
+                          child: Container(
+                            width: 120,
+                            height: 50,
+                            alignment: Alignment.center,
+                            child: Text(
+                              "Pronto!",
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontFamily: "Oilvare",
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ] else ...[
+                        Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.g2,
-                                padding: EdgeInsets.all(10),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  side: BorderSide(
-                                    color: AppColors.g1,
-                                    width: 2,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.g2,
+                                    padding: EdgeInsets.all(10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side: BorderSide(
+                                        color: AppColors.g1,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    final player = AudioPlayer();
+                                    await player.play(
+                                      AssetSource('audios/completa.mp3'),
+                                    );
+                                    print('Tocando som de completar fase');
+                                    registrarDesempenho(
+                                      'memoria',
+                                      false,
+                                    ); // registra erro
+                                    completar_fase(
+                                      context,
+                                      '4',
+                                      "Que pena!",
+                                      "Você errou dessa vez, quer tentar de novo?",
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 100,
+                                    height: 100,
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      "1",
+                                      style: TextStyle(
+                                        fontSize: 35,
+                                        fontFamily: "Oilvare",
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              onPressed: () {
-                                completar_fase(
-                                  context,
-                                  '4',
-                                  "Você errou dessa vez, quer tentar de novo?",
-                                );
-                              },
-                              child: Container(
-                                width: 100,
-                                height: 100,
-                                alignment: Alignment.center,
-                                child: Text(
-                                  "3",
-                                  style: TextStyle(
-                                    fontSize: 35,
-                                    fontFamily: "Oilvare",
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                SizedBox(height: 20, width: 20),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.g2,
+                                    padding: EdgeInsets.all(10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side: BorderSide(
+                                        color: AppColors.g1,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    registrarDesempenho(
+                                      'memoria',
+                                      false,
+                                    ); // registra erro
+                                    completar_fase(
+                                      context,
+                                      '4',
+                                      "Que pena!",
+                                      "Você errou dessa vez, quer tentar de novo?",
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 100,
+                                    height: 100,
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      "2",
+                                      style: TextStyle(
+                                        fontSize: 35,
+                                        fontFamily: "Oilvare",
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                            SizedBox(height: 20, width: 20),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.g2,
-                                padding: EdgeInsets.all(10),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  side: BorderSide(
-                                    color: AppColors.g1,
-                                    width: 2,
+                            SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.g2,
+                                    padding: EdgeInsets.all(10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side: BorderSide(
+                                        color: AppColors.g1,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    registrarDesempenho(
+                                      'memoria',
+                                      false,
+                                    ); // registra erro
+                                    completar_fase(
+                                      context,
+                                      '4',
+                                      "Que pena!",
+                                      "Você errou dessa vez, quer tentar de novo?",
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 100,
+                                    height: 100,
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      "3",
+                                      style: TextStyle(
+                                        fontSize: 35,
+                                        fontFamily: "Oilvare",
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              onPressed: () {
-                                completar_fase(
-                                  context,
-                                  '4',
-                                  "Você acertou! Parabéns por completar a atividade.",
-                                );
-                              },
-                              child: Container(
-                                width: 100,
-                                height: 100,
-                                alignment: Alignment.center,
-                                child: Text(
-                                  "4",
-                                  style: TextStyle(
-                                    fontSize: 35,
-                                    fontFamily: "Oilvare",
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                SizedBox(height: 20, width: 20),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.g2,
+                                    padding: EdgeInsets.all(10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side: BorderSide(
+                                        color: AppColors.g1,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    registrarDesempenho(
+                                      'memoria',
+                                      true,
+                                    ); // registra acerto
+                                    completar_fase(
+                                      context,
+                                      '4',
+                                      "Parabéns!",
+                                      "Você acertou! Parabéns por completar a atividade.",
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 100,
+                                    height: 100,
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      "4",
+                                      style: TextStyle(
+                                        fontSize: 35,
+                                        fontFamily: "Oilvare",
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
                           ],
                         ),
                       ],
-                    ),
-                  ],
+                    ],
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            right: 0,
+            bottom: 10,
+            child: Image.asset("assets/imagens/doey_pen.png", height: ok == "s" ? 250 : 150),
+          ),
+        ],
       ),
     );
   }

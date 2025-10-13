@@ -1,10 +1,12 @@
+import 'package:aprendiz/widgets/BottomAppAtividade.dart';
+import 'package:aprendiz/widgets/completar%20a%20fase.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:aprendiz/telas/progresso_fala.dart';
 import 'package:aprendiz/utils/levels.dart';
 import 'package:aprendiz/utils/Style.dart';
-import 'package:aprendiz/widgets/Bottomapp.dart';
 import 'package:aprendiz/widgets/topodapagina.dart';
+import 'package:aprendiz/utils/desempenho_utils.dart'; // Adicione o import
 
 enum SpeakStatus { none, success, error }
 
@@ -42,7 +44,7 @@ class _FalaActivityState extends State<FalaActivity> {
     final levelData = fala[widget.level];
     theme = levelData.first['theme'] ?? '';
     exercicios = levelData.sublist(1).map((e) => Exercicio.fromMap(e)).toList();
-    userSpeaks = List.generate(exercicios.length, (_) => '');
+    userSpeaks = List.generate(exercicios.length, (_) => '2');
   }
 
   void showSuccessDialog() {
@@ -51,6 +53,7 @@ class _FalaActivityState extends State<FalaActivity> {
       barrierDismissible: false,
       builder:
           (context) => AlertDialog(
+            backgroundColor: AppColors.b1,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -58,14 +61,12 @@ class _FalaActivityState extends State<FalaActivity> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: const [
-                Icon(Icons.check_circle, color: Colors.green, size: 60),
-                SizedBox(height: 16),
                 Text(
                   "Parabéns!",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 SizedBox(height: 10),
-                Text("Você acertou a frase!"),
+                Text("Você acertou!", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
               ],
             ),
           ),
@@ -105,7 +106,7 @@ class _FalaActivityState extends State<FalaActivity> {
         setState(() => userSpeaks[currentExercicio] = capturedSpeech);
       },
       localeId: 'pt_BR',
-      listenFor: const Duration(seconds: 5),
+      listenFor: const Duration(seconds: 10),
       pauseFor: const Duration(seconds: 2),
       partialResults: true,
       cancelOnError: true,
@@ -127,6 +128,7 @@ class _FalaActivityState extends State<FalaActivity> {
     final falado = captured.toLowerCase().trim();
 
     if (falado == esperado) {
+      registrarDesempenho('fala', true); // registra acerto
       setState(() => speakStatus = SpeakStatus.success);
       showSuccessDialog();
       await Future.delayed(const Duration(seconds: 2));
@@ -139,9 +141,10 @@ class _FalaActivityState extends State<FalaActivity> {
           speakStatus = SpeakStatus.none;
         });
       } else {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => TelaFala()));
+        completar_fase(context, "2", "Parabéns!", "Você completou a fase.");
       }
     } else {
+      registrarDesempenho('fala', false); // registra erro
       setState(() => speakStatus = SpeakStatus.error);
     }
   }
@@ -153,72 +156,82 @@ class _FalaActivityState extends State<FalaActivity> {
     return Scaffold(
       appBar: Toppagina(cor4: AppColors.b2),
       backgroundColor: AppColors.b1,
-      bottomNavigationBar: BottomApp(
+      bottomNavigationBar: BottomAppAtividade(
         context: context,
-        cor3: AppColors.b2,
-        ismenu: false,
+        cor: AppColors.b2,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppColors.b2,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.b1, width: 2),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    theme,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontFamily: "Oilvare",
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.spatial_audio, color: Colors.white),
-                    onPressed: () {
-                      // Implementar áudio, se necessário
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(exercicio.speak),
-            Image.network(exercicio.img),
-            const SizedBox(height: 10),
-            if (speakStatus == SpeakStatus.error)
-              const Text("Frase errada", style: TextStyle(color: Colors.red)),
-            const SizedBox(height: 10),
-            isListening
-                ? const Text("Te escutando 😁")
-                : ElevatedButton(
-                  onPressed: listen,
-                  child: const Text(
-                    "Falar",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.b2,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 15,
-                    ),
-                    textStyle: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+      body: SizedBox.expand(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.b2,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.b1, width: 2),
                 ),
-          ],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      theme,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontFamily: "Oilvare",
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.spatial_audio, color: Colors.white),
+                      onPressed: () async {
+                        final player = AudioPlayer();
+                        await player.play(AssetSource('audios/Fala_1.mp3'));
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Image.network(exercicio.img),
+              const SizedBox(height: 10),
+              if (speakStatus == SpeakStatus.error)
+                const Text("Tente denovo", style: TextStyle(color: AppColors.b3, fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              isListening
+                  ? const Text("Te escutando 😁", style: TextStyle(color: AppColors.b3, fontSize: 20, fontWeight: FontWeight.bold))
+                  : ElevatedButton(
+                      onPressed: listen,
+                      child: const Text(
+                        "Falar",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.b2,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 15,
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+            ],
+          ),
+        ),
+      ),
+      // Mascote no canto inferior direito acima da barra
+      floatingActionButton: Positioned(
+        right: 0,
+        bottom: 10, // ajuste para ficar acima da barra
+        child: Image.asset(
+          "assets/imagens/doey_pen.png", // nome do arquivo do mascote
+          height: 250,
         ),
       ),
     );

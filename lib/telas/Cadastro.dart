@@ -4,12 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class CadastroScreen extends StatelessWidget {
+class CadastroScreen extends StatefulWidget {
+  @override
+  State<CadastroScreen> createState() => _CadastroScreenState();
+}
+
+class _CadastroScreenState extends State<CadastroScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confpasswordController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
+
+  bool _showPassword = false;
+  bool _showConfPassword = false;
 
   @override
   Widget build(BuildContext context) {
@@ -73,11 +81,23 @@ class CadastroScreen extends StatelessWidget {
             'Senha',
             isPassword: true,
             controller: passwordController,
+            showPassword: _showPassword,
+            togglePassword: () {
+              setState(() {
+                _showPassword = !_showPassword;
+              });
+            },
           ),
           _buildTextField(
             'Confirme sua senha',
             isPassword: true,
             controller: confpasswordController,
+            showPassword: _showConfPassword,
+            togglePassword: () {
+              setState(() {
+                _showConfPassword = !_showConfPassword;
+              });
+            },
           ),
           SizedBox(height: 20),
           _buildButton('Cadastrar', () async {
@@ -215,15 +235,25 @@ class CadastroScreen extends StatelessWidget {
     String label, {
     TextEditingController? controller,
     bool isPassword = false,
+    bool showPassword = false,
+    VoidCallback? togglePassword,
   }) {
     return Padding(
       padding: EdgeInsets.only(bottom: 15),
       child: TextField(
         controller: controller,
-        obscureText: isPassword,
+        obscureText: isPassword && !showPassword,
         decoration: InputDecoration(
           labelText: label,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    showPassword ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  onPressed: togglePassword,
+                )
+              : null,
         ),
       ),
     );

@@ -27,14 +27,14 @@ class TelaMemoria extends StatelessWidget {
         cor3: AppColors.g2,
         ismenu: false,
       ),
-      body: SingleChildScrollView(
-        // Adicione este widget
-        child: Center(
+      body:
+        Center(
           child: SizedBox(
             width: 270, // Defina a largura desejada
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                
                 children: [
                   SizedBox(height: 30),
                   Button(
@@ -50,7 +50,6 @@ class TelaMemoria extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 }

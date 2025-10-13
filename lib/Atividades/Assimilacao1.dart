@@ -1,7 +1,9 @@
+import 'package:aprendiz/widgets/BottomAppAtividade.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:aprendiz/telas/progresso_assimilacao.dart';
 import 'package:aprendiz/transitions/Transicao.dart';
 import 'package:aprendiz/utils/Style.dart';
+import 'package:aprendiz/utils/desempenho_utils.dart';
 import 'package:aprendiz/widgets/topodapagina.dart';
 import 'package:flutter/material.dart';
 
@@ -120,9 +122,15 @@ class _AssimilacaoActivityState extends State<AssimilacaoActivity> {
         appBar: Toppagina(
           cor4: AppColors.y2,
         ),
-        body: Container(
-            color: AppColors.y1,
-            child: Padding(
+        bottomNavigationBar: BottomAppAtividade(
+  context: context,
+  cor: AppColors.y2
+),
+        body: Stack(
+          children: [
+            Container(
+              color: AppColors.y1,
+              child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
                   children: [
@@ -193,12 +201,13 @@ class _AssimilacaoActivityState extends State<AssimilacaoActivity> {
                                       if (selectedAudioIndex ==
                                           selectedImageIndex) {
                                         acertos[i] = true;
+                                        registrarDesempenho('assimilacao', true); // <-- registra acerto
                                         verificaAcertos();
                                       } else {
                                         erros[i] = true;
+                                        registrarDesempenho('assimilacao', false); // <-- registra erro
                                         // Limpa o erro após 1 segundo
-                                        Future.delayed(Duration(seconds: 1),
-                                            () {
+                                        Future.delayed(Duration(seconds: 1), () {
                                           setState(() {
                                             erros[i] = false;
                                           });
@@ -238,9 +247,11 @@ class _AssimilacaoActivityState extends State<AssimilacaoActivity> {
                                       if (selectedAudioIndex ==
                                           selectedImageIndex) {
                                         acertos[i] = true;
+                                        registrarDesempenho('assimilacao', true); // <-- registra acerto
                                         verificaAcertos();
                                       } else {
                                         erros[i] = true;
+                                        registrarDesempenho('assimilacao', false); // <-- registra acerto
                                         Future.delayed(Duration(seconds: 1),
                                             () {
                                           setState(() {
@@ -260,7 +271,20 @@ class _AssimilacaoActivityState extends State<AssimilacaoActivity> {
                       ],
                     ),
                   ],
-                ))));
+                ),
+              ),
+            ),
+            Positioned(
+              right: 0,
+              bottom: 10,
+              child: Image.asset(
+                "assets/imagens/doey_pen.png",
+                height: 250,
+              ),
+            ),
+          ],
+        ),
+    );
   }
 }
 

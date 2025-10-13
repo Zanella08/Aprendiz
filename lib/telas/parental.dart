@@ -6,6 +6,8 @@ import 'package:aprendiz/utils/global.dart';
 import 'package:aprendiz/widgets/Bottomapp.dart';
 import 'package:aprendiz/widgets/modulos.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,8 +26,48 @@ class MyApp extends StatelessWidget {
 }
 
 // ignore: must_be_immutable
-class ParentalScreen extends StatelessWidget {
+class ParentalScreen extends StatefulWidget {
   ParentalScreen({super.key});
+
+  @override
+  _ParentalScreenState createState() => _ParentalScreenState();
+}
+
+class _ParentalScreenState extends State<ParentalScreen> {
+  String codigoParentalBD = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarCodigoParental();
+    _carregarModoNoturno();
+  }
+
+  Future<void> _carregarCodigoParental() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(user.uid)
+          .get();
+      setState(() {
+        codigoParentalBD = doc.data()?['codigoDesbloqueio'] ?? "";
+      });
+    }
+  }
+
+  Future<void> _carregarModoNoturno() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(user.uid)
+          .get();
+      setState(() {
+        Global.nightMode = doc.data()?['nightMode'] ?? false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,12 +165,14 @@ class ParentalScreen extends StatelessWidget {
               context: context,
               builder:
                   (context) => AlertDialog(
-                    title: Text('Definir Tempo de Uso'),
+                    backgroundColor: appcolor(),
+                    title: Text('Definir Tempo de Uso' 
+                        , style: TextStyle(color: appcolor2()),),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Defina o tempo de uso do aplicativo (em minutos):',
+                          'Defina o tempo de uso do aplicativo (em minutos):', style: TextStyle(color: appcolor2()),
                         ),
                         SizedBox(height: 10),
                         TextField(
@@ -148,7 +192,7 @@ class ParentalScreen extends StatelessWidget {
                         onPressed: () {
                           Navigator.pop(context); // Fecha o pop-up sem salvar
                         },
-                        child: Text('Cancelar'),
+                        child: Text('Cancelar', style: TextStyle(color: appcolor2()),),
                       ),
                       TextButton(
                         onPressed: () {
@@ -165,14 +209,14 @@ class ParentalScreen extends StatelessWidget {
                               content: Text(
                                 Global.tempo >= 1
                                     ? 'Tempo de uso definido para ${Global.tempo} minutos.'
-                                    : 'Tempo de uso definido para menos de 1 minuto.',
+                                    : 'Tempo de uso definido para menos de 1 minuto.',style: TextStyle(color: appcolor2()),
                               ),
                             ),
                           );
                           Navigator.pop(context);
                           Transicao(context, ParentalScreen());
                         },
-                        child: Text('Salvar'),
+                        child: Text('Salvar', style: TextStyle(color: appcolor2()),),
                       ),
                     ],
                   ),
@@ -181,65 +225,65 @@ class ParentalScreen extends StatelessWidget {
           SizedBox(height: 20),
           _buildTextField(
             'Código Parental',
-            controller: TextEditingController(text: Global.codigoDesbloqueio),
+            controller: TextEditingController(text: codigoParentalBD), 
           ),
           _buildButton('Redefinir o código parental', () {
             TextEditingController codigoparental = TextEditingController();
             showDialog(
               context: context,
-              builder:
-                  (context) => AlertDialog(
-                    title: Text('Redefinir código'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Digite seu novo código:'),
-                        SizedBox(height: 10),
-                        TextField(
-                          controller: codigoparental,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            labelText: 'Novo Código Parental',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
+              builder: (context) => AlertDialog(
+                backgroundColor: appcolor(),
+                title: Text('Redefinir código', style: TextStyle(color: appcolor2()),),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Digite seu novo código:', style: TextStyle(color: appcolor2()),),
+                    SizedBox(height: 10),
+                    TextField(
+                      controller: codigoparental,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        
+                        labelText: "Novo código",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ],
+                      ),
                     ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context); // Fecha o pop-up sem salvar
-                        },
-                        child: Text('Cancelar'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          if (codigoparental.text.isNotEmpty &&
-                              codigoparental.text != Global.codigoDesbloqueio) {
-                            Global.codigoDesbloqueio = codigoparental.text;
-                            Navigator.pop(context); // Fecha o pop-up
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Código redefinido com sucesso!'),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Por favor, insira um código novo.',
-                                ),
-                              ),
-                            );
-                          }
-                          Transicao(context, PerfilScreen());
-                        },
-                        child: Text('Salvar'),
-                      ),
-                    ],
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Fecha o pop-up sem salvar
+                    },
+                    child: Text('Cancelar', style: TextStyle(color: appcolor2()),),
                   ),
+                  TextButton(
+                    onPressed: () async {
+                      final user = FirebaseAuth.instance.currentUser;
+                      if (codigoparental.text.isNotEmpty && user != null) {
+                        await FirebaseFirestore.instance
+                            .collection('usuarios')
+                            .doc(user.uid)
+                            .update({'codigoDesbloqueio': codigoparental.text});
+                        setState(() {
+                          codigoParentalBD = codigoparental.text;
+                        });
+                        Navigator.pop(context); // Fecha o pop-up
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Código redefinido com sucesso!', style: TextStyle(color: appcolor2()),)),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Por favor, insira um código novo.', style: TextStyle(color: appcolor2()),)),
+                        );
+                      }
+                    },
+                    child: Text('Salvar', style: TextStyle(color: appcolor2()),),
+                  ),
+                ],
+              ),
             );
           }),
           SizedBox(height: 20),
@@ -248,13 +292,14 @@ class ParentalScreen extends StatelessWidget {
               context: context,
               builder:
                   (context) => AlertDialog(
-                    title: Text('Redefinir código'),
+                    backgroundColor: appcolor(),
+                    title: Text('Redefinir código', style: TextStyle(color: appcolor2()),),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Ao confirmar, você ativará o modo parental. \nOnde o aplicativo bloqueará o uso após o tempo definido e bloqueará o acesso a página de perfil e de desempenho.\nCaso não tenha definido um tempo de uso do aplicativo, apenas o acesso as páginas de perfil e desempenho serão bloqueadas. \n\n Deseja continuar?',
-                        ),
+                          'Ao confirmar, você ativará o modo parental. \nOnde o aplicativo bloqueará o uso após o tempo definido e bloqueará o acesso a página de perfil e de desempenho.\nCaso não tenha definido um tempo de uso do aplicativo, apenas o acesso as páginas de perfil e desempenho serão bloqueadas. \n\n Deseja continuar?'
+                        , style: TextStyle(color: appcolor2()),),
                       ],
                     ),
                     actions: [
@@ -262,14 +307,14 @@ class ParentalScreen extends StatelessWidget {
                         onPressed: () {
                           Navigator.pop(context); // Fecha o pop-up sem salvar
                         },
-                        child: Text('Cancelar'),
+                        child: Text('Cancelar', style: TextStyle(color: appcolor2()),),
                       ),
                       TextButton(
                         onPressed: () {
                           Global.modoParental = true;
                           Transicao(context, Modulos());
                         },
-                        child: Text('Salvar'),
+                        child: Text('Salvar', style: TextStyle(color: appcolor2()),),
                       ),
                     ],
                   ),

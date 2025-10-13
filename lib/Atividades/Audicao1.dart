@@ -1,7 +1,9 @@
 import 'package:aprendiz/telas/progresso_audicao.dart';
+import 'package:aprendiz/widgets/BottomAppAtividade.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:aprendiz/transitions/Transicao.dart';
 import 'package:aprendiz/utils/Style.dart';
+import 'package:aprendiz/utils/desempenho_utils.dart'; // Adicione o import
 import 'package:aprendiz/widgets/topodapagina.dart';
 import 'package:flutter/material.dart';
 
@@ -120,9 +122,15 @@ class AudicaoActivityState extends State<AudicaoActivity> {
         appBar: Toppagina(
           cor4: AppColors.v2,
         ),
-        body: Container(
-            color: AppColors.v1,
-            child: Padding(
+        bottomNavigationBar: BottomAppAtividade(
+  context: context,
+  cor: AppColors.v2
+),
+        body: Stack(
+          children: [
+            Container(
+              color: AppColors.v1,
+              child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
                   children: [
@@ -193,9 +201,11 @@ class AudicaoActivityState extends State<AudicaoActivity> {
                                       if (selectedAudioIndex ==
                                           selectedImageIndex) {
                                         acertos[i] = true;
+                                        registrarDesempenho('audicao', true); // registra acerto
                                         verificaAcertos();
                                       } else {
                                         erros[i] = true;
+                                        registrarDesempenho('audicao', false); // registra erro
                                         // Limpa o erro após 1 segundo
                                         Future.delayed(Duration(seconds: 1),
                                             () {
@@ -238,9 +248,11 @@ class AudicaoActivityState extends State<AudicaoActivity> {
                                       if (selectedAudioIndex ==
                                           selectedImageIndex) {
                                         acertos[i] = true;
+                                        registrarDesempenho('audicao', true); // registra acerto
                                         verificaAcertos();
                                       } else {
                                         erros[i] = true;
+                                        registrarDesempenho('audicao', false); // registra erro
                                         Future.delayed(Duration(seconds: 1),
                                             () {
                                           setState(() {
@@ -260,7 +272,19 @@ class AudicaoActivityState extends State<AudicaoActivity> {
                       ],
                     ),
                   ],
-                ))));
+                ),
+              ),
+            ),
+            Positioned(
+              right: 0,
+              bottom: 10,
+              child: Image.asset(
+                "assets/imagens/doey_pen.png",
+                height: 250,
+              ),
+            ),
+          ],
+        ));
   }
 }
 

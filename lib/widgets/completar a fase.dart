@@ -4,13 +4,10 @@ import 'package:aprendiz/telas/progresso_fala.dart';
 import 'package:aprendiz/telas/progresso_memoria.dart';
 import 'package:aprendiz/transitions/Transicao.dart';
 import 'package:aprendiz/utils/Style.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
-completar_fase(BuildContext context, String modulo, String texto1) async {
-  final player = AudioPlayer();
-  await player.play(AssetSource('completa.mp3'));
-
+completar_fase(BuildContext context, String modulo, String texto1, String texto2) async {
+  
   await showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -18,15 +15,15 @@ completar_fase(BuildContext context, String modulo, String texto1) async {
         modulo == '1'
             ? AppColors.v2
             : modulo == '2'
-            ? AppColors.b2
+            ? AppColors.b1
             : modulo == '3'
             ? AppColors.y2
             : AppColors.g2,
     title: Text(
-      'Parabéns!',
+      texto1,
       style: TextStyle(color: Colors.white, fontSize: 25),
     ),
-    content: Text(texto1, style: TextStyle(color: Colors.white, fontSize: 18)),
+    content: Text(texto2, style: TextStyle(color: Colors.white, fontSize: 18)),
     actions: [
       TextButton(
         style: TextButton.styleFrom(
@@ -34,7 +31,7 @@ completar_fase(BuildContext context, String modulo, String texto1) async {
               modulo == '1'
                   ? AppColors.v3
                   : modulo == '2'
-                  ? AppColors.b3
+                  ? AppColors.b2
                   : modulo == '3'
                   ? AppColors.y3
                   : AppColors.g3,

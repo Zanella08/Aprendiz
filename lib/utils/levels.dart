@@ -1,6 +1,6 @@
 List<List<Map<String, dynamic>>> fala = [
   [
-    {"level": 1, "theme": 'Diga os nomes dos animalzinhos'},
+    {"level": 1, "theme": 'Diga os nomes dos animaizinhos'},
     {
       "img":
           "https://media.istockphoto.com/id/1443562748/pt/foto/cute-ginger-cat.jpg?s=612x612&w=0&k=20&c=OqlMF3bysUX6cVux5kKc1gqCGMghQpGc5ukyw1qG82s=",
@@ -8,23 +8,8 @@ List<List<Map<String, dynamic>>> fala = [
     },
     {
       "img":
-          "https://media.istockphoto.com/id/534083197/pt/foto/fogo-alfabeto-letra-h.jpg?s=612x612&w=0&k=20&c=rhl4IC2gqjfPIbd7a6cC7J6kw0kZz4EkH0FQmSdz-hs=",
+          "https://media.istockphoto.com/id/1503385646/pt/foto/portrait-funny-and-happy-shiba-inu-puppy-dog-peeking-out-from-behind-a-blue-banner-isolated-on.jpg?s=612x612&w=0&k=20&c=svp3fKo9okQL-AsBZbBXRx5TC5deE7jDbUKQAQl2hOc=",
       "speak": "Cachorro",
-    },
-    {
-      "img":
-          "https://media.istockphoto.com/id/534083197/pt/foto/fogo-alfabeto-letra-h.jpg?s=612x612&w=0&k=20&c=rhl4IC2gqjfPIbd7a6cC7J6kw0kZz4EkH0FQmSdz-hs=",
-      "speak": "Macaco",
-    },
-    {
-      "img":
-          "https://media.istockphoto.com/id/534083197/pt/foto/fogo-alfabeto-letra-h.jpg?s=612x612&w=0&k=20&c=rhl4IC2gqjfPIbd7a6cC7J6kw0kZz4EkH0FQmSdz-hs=",
-      "speak": "Vaca",
-    },
-    {
-      "img":
-          "https://media.istockphoto.com/id/534083197/pt/foto/fogo-alfabeto-letra-h.jpg?s=612x612&w=0&k=20&c=rhl4IC2gqjfPIbd7a6cC7J6kw0kZz4EkH0FQmSdz-hs=",
-      "speak": "Cavalo",
     },
   ],
 
