@@ -1,5 +1,5 @@
 import 'package:aprendiz/widgets/BottomAppAtividade.dart';
-import 'package:aprendiz/widgets/completar%20a%20fase.dart';
+import 'package:aprendiz/widgets/completar_fase.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -141,7 +141,7 @@ class _FalaActivityState extends State<FalaActivity> {
           speakStatus = SpeakStatus.none;
         });
       } else {
-        completar_fase(context, "2", "Parabéns!", "Você completou a fase.");
+        completarFase(context, "2", "Parabéns!", "Você completou a fase.");
       }
     } else {
       registrarDesempenho('fala', false); // registra erro
@@ -231,7 +231,7 @@ class _FalaActivityState extends State<FalaActivity> {
         bottom: 10, // ajuste para ficar acima da barra
         child: Image.asset(
           "assets/imagens/doey_pen.png", // nome do arquivo do mascote
-          height: 250,
+          height: 200,
         ),
       ),
     );

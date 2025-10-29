@@ -134,7 +134,7 @@ class DesempenhoBarra extends StatelessWidget {
             ),
             Container(
               height: 20,
-              width: MediaQuery.of(context).size.width * 1 * porcentagem,
+              width: MediaQuery.of(context).size.width * 0.80* porcentagem,
               decoration: BoxDecoration(
                 color: cor,
                 borderRadius: BorderRadius.circular(20),

@@ -16,6 +16,8 @@ dependencies:
   firebase_core: ^4.2.0
   js: ^0.7.2
   cloud_firestore: ^6.0.3
+  confetti: ^0.7.0
+  just_audio: ^0.9.39
   
 dev_dependencies:
   flutter_test:
@@ -45,7 +47,6 @@ flutter:
       - assets/imagens/
       - assets/fonts/
       - assets/icons/
-      - lib/exemp/
       - lib/widgets/
       - lib/utils/
       - assets/icons/

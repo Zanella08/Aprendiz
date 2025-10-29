@@ -2,7 +2,7 @@ import 'package:aprendiz/utils/Style.dart';
 import 'package:aprendiz/widgets/BottomAppAtividade.dart';
 import 'package:aprendiz/widgets/topodapagina.dart';
 import 'package:aprendiz/utils/audio_utils.dart';
-import 'package:aprendiz/widgets/completar a fase.dart'; // Importa completar_fase
+import 'package:aprendiz/widgets/completar_fase.dart'; // Importa completar_fase
 import 'package:aprendiz/utils/desempenho_utils.dart'; // Adicione o import
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -189,7 +189,7 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                       'memoria',
                                       false,
                                     ); // registra erro
-                                    completar_fase(
+                                     completarFase(
                                       context,
                                       '4',
                                       "Que pena!",
@@ -229,7 +229,7 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                       'memoria',
                                       false,
                                     ); // registra erro
-                                    completar_fase(
+                                    completarFase(
                                       context,
                                       '4',
                                       "Que pena!",
@@ -275,7 +275,7 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                       'memoria',
                                       false,
                                     ); // registra erro
-                                    completar_fase(
+                                    completarFase(
                                       context,
                                       '4',
                                       "Que pena!",
@@ -315,7 +315,7 @@ class _MemoriaActivityState extends State<MemoriaActivity> {
                                       'memoria',
                                       true,
                                     ); // registra acerto
-                                    completar_fase(
+                                    completarFase(
                                       context,
                                       '4',
                                       "Parabéns!",
